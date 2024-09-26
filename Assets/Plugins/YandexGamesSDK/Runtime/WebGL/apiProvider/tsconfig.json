@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es5",                // Unity WebGL typically requires ES5 compatibility
+      "module": "es6",                // Use ES6 module system
+      "strict": true,                 // Enable all strict type-checking options
+      "esModuleInterop": true,        // Allow interop with CommonJS modules
+      "skipLibCheck": true,           // Skip type checking of declaration files
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist"              // Output folder for compiled JavaScript
+    },
+    "include": [
+      "src/**/*"
+    ]
+  }
+  
