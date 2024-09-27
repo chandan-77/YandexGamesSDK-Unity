@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES5",                  // Ensures compatibility with older environments
+    "module": "ESNext",               // Module system for Webpack
+    "strict": true,                   
+    "esModuleInterop": true,          
+    "importHelpers": false,           // Disable importing helpers from tslib
+    "skipLibCheck": true,             
+    "baseUrl": "./",
+    "paths": {
+      "tslib": ["./node_modules/tslib/tslib.d.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}

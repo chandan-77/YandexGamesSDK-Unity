@@ -8,29 +8,15 @@ public class GameManager : MonoBehaviour
 {
     void Start()
     {
-       YandexGamesSDK.Instance.Authentication.AuthenticateUser((isAuh, error) =>
-       {
-           
-       });
-       
-       YandexGamesSDK.Instance.Advertisement.ShowRewardedAd();
-       
-    }
+        YandexGamesSDK.Instance.Authentication.AuthenticateUser((isAuh, error) =>
+        {
+            Debug.Log("IsAuth: " + isAuh);
 
-    [DllImport("__Internal")]
-    private static extern int add(int a, int b);
-
-    [DllImport("__Internal")]
-    private static extern int subtract(int a, int b);
-
-    void Staart()
-    {
-        // Call the JS functions from Unity
-        int resultAdd = add(5, 3);
-        int resultSubtract = subtract(10, 4);
-
-        Debug.Log($"Add: {resultAdd}");
-        Debug.Log($"Subtract: {resultSubtract}");
+            if (isAuh)
+            {
+                Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
+            }
+        });
     }
 
     void Update()

@@ -52,9 +52,9 @@ namespace Plugins.YandexGamesSDK.Runtime
         private void InitializeModules()
         {
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
-            Advertisement = LoadAndInitializeModule<AdvertisementModule>();
-            Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
-            CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
+            // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
+            // Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
+            // CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }
 
         private TModule LoadAndInitializeModule<TModule>() where TModule : YGModuleBase

@@ -555,7 +555,13 @@ PlayerSettings:
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
-  m_TemplateCustomTags: {}
+  m_TemplateCustomTags:
+    HIDE_FULL_SCREEN_BUTTON: 
+    PRODUCT_DESCRIPTION: 
+    UNITY_WEBGL_CODE_URL: 
+    UNITY_WEBGL_DATA_URL: 
+    UNITY_WEBGL_FRAMEWORK_URL: 
+    UNITY_WEBGL_LOADER_URL: 
   mobileMTRendering:
     Android: 1
     iPhone: 1
