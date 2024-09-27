@@ -9,7 +9,9 @@
     <!-- Robots Meta Tag -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <!-- Include Yandex SDK -->
-    <script src="https://yandex.ru/games/sdk/v2"></script>
+<!--    <script src="https://yandex.ru/games/sdk/v2"></script>-->
+    <script src="__sdk.js"></script>
+    
     <!-- Styles -->
     <style>
         /* Include necessary CSS styles */
@@ -89,91 +91,94 @@
 <div id="unity-fullscreen-button"></div>
 
 <script>
-    // Initialize the Yandex SDK
-    YaGames.init()
-        .then(function(ysdk) {
-            window.ysdk = ysdk;  // Store the SDK globally
-            console.log("YSDK Loaded");
-        
-             const hideFullScreenButton = "{{{ HIDE_FULL_SCREEN_BUTTON }}}";
 
-            // Now load the Unity game
-            var buildUrl = "Build";
-            var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
-            var config = {
-                dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-                frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-                codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
-                #if MEMORY_FILENAME
-                memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
-                #endif
-                #if SYMBOLS_FILENAME
-                symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
-                #endif
-                streamingAssetsUrl: "StreamingAssets",
-                companyName: "{{{ COMPANY_NAME }}}",
-                productName: "{{{ PRODUCT_NAME }}}",
-                productVersion: "{{{ PRODUCT_VERSION }}}",
-            };
-
-            const container = document.querySelector("#unity-container");
-            const canvas = document.querySelector("#unity-canvas");
-            const loadingCover = document.querySelector("#loading-cover");
-            const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-
-            const canFullscreen = (function() {
-                for (const key of [
-                    'exitFullscreen',
-                    'webkitExitFullscreen',
-                    'webkitCancelFullScreen',
-                    'mozCancelFullScreen',
-                    'msExitFullscreen',
-                ]) {
-                    if (key in document) {
-                        return true;
-                    }
-                }
-                return false;
-            }());
-
-            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-                container.className = "unity-mobile";
-                config.devicePixelRatio = 1;
-            }
-            #if BACKGROUND_FILENAME
-            canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
-            #endif
-            loadingCover.style.display = "";
-
-            const script = document.createElement("script");
-            script.src = loaderUrl;
-            script.onload = () => {
-                createUnityInstance(canvas, config, (progress) => {
-                    // Update progress bar or spinner if necessary
-                }).then((unityInstance) => {
-                    loadingCover.style.display = "none";
-                    if (canFullscreen) {
-                        if (!hideFullScreenButton) {
-                            fullscreenButton.style.display = "";
-                        }
-                        fullscreenButton.onclick = () => {
-                            unityInstance.SetFullscreen(1);
-                        };
-                    }
-                }).catch((message) => {
-                    alert("Failed to load Unity game: " + message);
-                });
-            };
-            script.onerror = function () {
-                alert("Failed to load Unity loader script");
-            };
-            document.body.appendChild(script);
-
-        })
-        .catch(function (error) {
-            console.error("YSDK Failed to load:", error.message);
-            alert("Failed to initialize Yandex SDK: " + error.message);
-        });
+ 
+    //
+    // // Initialize the Yandex SDK
+    // YaGames.init()
+    //     .then(function(ysdk) {
+    //         window.ysdk = ysdk;  // Store the SDK globally
+    //         console.log("YSDK Loaded");
+    //    
+    //          const hideFullScreenButton = "{{{ HIDE_FULL_SCREEN_BUTTON }}}";
+    //
+    //         // Now load the Unity game
+    //         var buildUrl = "Build";
+    //         var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+    //         var config = {
+    //             dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+    //             frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+    //             codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+    //             #if MEMORY_FILENAME
+    //             memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+    //             #endif
+    //             #if SYMBOLS_FILENAME
+    //             symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+    //             #endif
+    //             streamingAssetsUrl: "StreamingAssets",
+    //             companyName: "{{{ COMPANY_NAME }}}",
+    //             productName: "{{{ PRODUCT_NAME }}}",
+    //             productVersion: "{{{ PRODUCT_VERSION }}}",
+    //         };
+    //
+    //         const container = document.querySelector("#unity-container");
+    //         const canvas = document.querySelector("#unity-canvas");
+    //         const loadingCover = document.querySelector("#loading-cover");
+    //         const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    //
+    //         const canFullscreen = (function() {
+    //             for (const key of [
+    //                 'exitFullscreen',
+    //                 'webkitExitFullscreen',
+    //                 'webkitCancelFullScreen',
+    //                 'mozCancelFullScreen',
+    //                 'msExitFullscreen',
+    //             ]) {
+    //                 if (key in document) {
+    //                     return true;
+    //                 }
+    //             }
+    //             return false;
+    //         }());
+    //
+    //         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    //             container.className = "unity-mobile";
+    //             config.devicePixelRatio = 1;
+    //         }
+    //         #if BACKGROUND_FILENAME
+    //         canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+    //         #endif
+    //         loadingCover.style.display = "";
+    //
+    //         const script = document.createElement("script");
+    //         script.src = loaderUrl;
+    //         script.onload = () => {
+    //             createUnityInstance(canvas, config, (progress) => {
+    //                 // Update progress bar or spinner if necessary
+    //             }).then((unityInstance) => {
+    //                 loadingCover.style.display = "none";
+    //                 if (canFullscreen) {
+    //                     if (!hideFullScreenButton) {
+    //                         fullscreenButton.style.display = "";
+    //                     }
+    //                     fullscreenButton.onclick = () => {
+    //                         unityInstance.SetFullscreen(1);
+    //                     };
+    //                 }
+    //             }).catch((message) => {
+    //                 alert("Failed to load Unity game: " + message);
+    //             });
+    //         };
+    //         script.onerror = function () {
+    //             alert("Failed to load Unity loader script");
+    //         };
+    //         document.body.appendChild(script);
+    //
+    //     })
+    //     .catch(function (error) {
+    //         console.error("YSDK Failed to load:", error.message);
+    //         alert("Failed to initialize Yandex SDK: " + error.message);
+    //     });
 </script>
 </body>
 </html>

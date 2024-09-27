@@ -1,7 +1,6 @@
-
 export class AuthModule {
   static AuthenticateUser(): void {
-    if (typeof window.ysdk !== 'undefined') {
+    if (!window.isLocalHost()) {
       window.ysdk.getPlayer()
         .then((player: any) => {
           const profile = {
@@ -12,13 +11,20 @@ export class AuthModule {
             avatarUrlLarge: player.getPhoto('large'),
           };
 
-          SendMessage('YandexGamesSDK', 'OnAuthenticationSuccess', JSON.stringify(profile));
+          unityInstance.SendMessage('YandexGamesSDK', 'OnAuthenticationSuccess', JSON.stringify(profile));
         })
         .catch((error: any) => {
-          SendMessage('YandexGamesSDK', 'OnAuthenticationFailure', error.message || 'Error during authentication');
+          unityInstance.SendMessage('YandexGamesSDK', 'OnAuthenticationFailure', error.message || 'Error during authentication');
         });
     } else {
-      SendMessage('YandexGamesSDK', 'OnAuthenticationFailure', 'Yandex SDK not initialized.');
+      const profile = {
+        id: "10223",
+        name: "Turan",
+      };
+
+      unityInstance.SendMessage('YandexGamesSDK', 'OnAuthenticationSuccess', JSON.stringify(profile));
+
     }
+
   }
 }
