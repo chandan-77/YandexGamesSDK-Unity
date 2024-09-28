@@ -54,7 +54,7 @@ namespace Plugins.YandexGamesSDK.Runtime
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
             // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             // Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
-            // CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
+             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }
 
         private TModule LoadAndInitializeModule<TModule>() where TModule : YGModuleBase

@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build:dev": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.config.js && cp dist/sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/ && cp dist/sdk.js ../Assets/WebGLTemplates/YandexGames/",
+    "build:prod": "webpack --config webpack.config.js && cp dist/__sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/ && cp dist/__sdk.js ../Assets/WebGLTemplates/YandexGames/",
     "watch:dev": "webpack --config webpack.dev.js --watch",
     "build-and-copy": "webpack --config webpack.prod.js && cp dist/sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/"
   },
