@@ -3,7 +3,7 @@ import { YandexGames } from "YandexGamesSDK";
 export class StorageModule {
     static async savePlayerData(key: string, data: string): Promise<void> {
         try {
-            const player = await window.sdk.getPlayer(); // Cast window to any to get the Yandex SDK player instance
+            const player = await window.yandexSDK.getPlayer(); // Cast window to any to get the Yandex SDK player instance
 
             // Set the data as a key-value object
             await player.setData({ [key]: data }, true); // flush=true to ensure immediate data saving
@@ -19,7 +19,7 @@ export class StorageModule {
 
     static async loadPlayerData(key: string): Promise<void> {
         try {
-            const player:YandexGames.Player = await window.sdk.getPlayer(); // Cast window to any to get the Yandex SDK player instance
+            const player:YandexGames.Player = await window.yandexSDK.getPlayer(); // Cast window to any to get the Yandex SDK player instance
 
             // Fetch the data for the given key
             const data = await player.getData([key]);

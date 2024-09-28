@@ -1,10 +1,11 @@
+import { YandexGames } from "YandexGamesSDK";
 import { Utils } from "../../system/utils";
 
 export class AuthModule {
   static async authenticateUser(): Promise<void> {
     if (!Utils.isLocalhost()) {
       try {
-        var player: PlayerProfile = await window.sdk.getPlayer();
+        var player: YandexGames.Player = await window.yandexSDK.getPlayer();
         const profile = {
           id: player.getUniqueID(),
           name: player.getName(),
