@@ -1,5 +1,18 @@
-import { AuthModule } from "./modules/authModule";
+import { AuthModule } from './modules/auth/authModule';
+import { YandexGamesSDK } from './modules/YandexGamesSDK';
+import { StorageModule } from './modules/storage/storageModule';
 
-mergeInto(LibraryManager.library, {
-  AuthenticateUser: AuthModule.AuthenticateUser,
+window.YandexSDKVersion = YANDEX_SDK_VERSION;
+
+
+window.YandexSDKExports = {
+  AuthenticateUser: AuthModule.authenticateUser,
+  SavePlayerData: StorageModule.savePlayerData,
+  LoadPlayerData: StorageModule.loadPlayerData,
+  CheckForInitialization: YandexGamesSDK.checkForInitialization,
+  OnYandexGamesSDKReady: YandexGamesSDK.OnYandexGamesSDKReady
+};
+
+window.addEventListener('load', () => {
+  YandexGamesSDK.initialize();
 });

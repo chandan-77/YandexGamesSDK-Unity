@@ -10,5 +10,6 @@ namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         public string avatarUrlSmall;
         public string avatarUrlMedium;
         public string avatarUrlLarge;
+        public bool isAuthorized;
     }
 }

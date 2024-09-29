@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -6,6 +7,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [Serializable]
+    public struct PlayerData
+    {
+        public string playerName;
+        public string level;
+    }
     void Start()
     {
         YandexGamesSDK.Instance.Authentication.AuthenticateUser((isAuh, error) =>
@@ -21,22 +28,20 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.S))
-        // {
-        //     YandexGamesSDK.Instance.CloudStorage.SaveData("testData", new
-        //     {
-        //         platform = "Android",
-        //         platform_version = "1.0.0",
-        //         player_language = "en_US",
-        //         player_sound_vol = "1",
-        //     }, delegate { Debug.Log("Player saved."); });
-        // }
-        //
-        //
-        // if (Input.GetKeyDown(KeyCode.L))
-        // {
-        //     YandexGamesSDK.Instance.CloudStorage.LoadData("testData",
-        //         (a, b) => { Debug.Log($"Loading data: {a}, {b}"); });
-        // }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            YandexGamesSDK.Instance.CloudStorage.SaveData("testData", new PlayerData()
+            {
+                level = "1",
+                playerName = "SavedPlayer"
+            }, delegate { Debug.Log("Player saved."); });
+        }
+        
+        
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            YandexGamesSDK.Instance.CloudStorage.LoadData("testData",
+                (a, b) => { Debug.Log($"Loading data: {a}, {b}"); });
+        }
     }
 }

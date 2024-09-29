@@ -1,16 +1,29 @@
-interface PlayerProfile {
-  getUniqueID(): string;
-  getName(): string;
-  getPhoto(size: 'small' | 'medium' | 'large'): string;
+interface UnityInstance {
+  SendMessage(gameObject: string, methodName: string, value: any): void;
+}
+
+declare const YANDEX_SDK_VERSION: string;
+
+declare var createUnityInstance: any;
+declare var unityInstance: UnityInstance;
+declare var YandexSDKExports: any;
+
+interface ISDKExports {
+  [methodName: string]: (...args: any[]) => any;
 }
 
 interface Window {
-  ysdk: {
-    getPlayer: () => Promise<PlayerProfile>;
-  };
+  yandexSDK: any;
+  SDKExports: ISDKExports;
+  YandexSDKVersion: string;
+  unityInstance: UnityInstance;
 }
 
-declare var SendMessage: any;
-declare var mergeInto: any;
-declare var LibraryManager: any;
-declare var SendMessage: any;
+declare function SendMessage(gameObject: string, methodName: string, parameter?: any): void;
+declare function UTF8ToString(ptr: number): string;
+
+declare var mergeInto: (target: any, source: any) => void;
+
+declare var LibraryManager: {
+  library: any;
+};

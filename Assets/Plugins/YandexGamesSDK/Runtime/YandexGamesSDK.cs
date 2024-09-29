@@ -1,12 +1,12 @@
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
-using Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
-using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
-using Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
-using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
+using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
 
 namespace Plugins.YandexGamesSDK.Runtime
 {
+    [DefaultExecutionOrder(-100)]
     public class YandexGamesSDK : MonoBehaviour
     {
         private static YandexGamesSDK _instance;
@@ -30,10 +30,13 @@ namespace Plugins.YandexGamesSDK.Runtime
             }
         }
 
+        [DllImport("__Internal")]
+        private static extern void OnYandexGamesSDKReady();
+
         public IAuthenticationModule Authentication { get; private set; }
-        public IAdvertisementModule Advertisement { get; private set; }
-        public ILeaderboardModule Leaderboard { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
+
+        private bool _isInitialized = false;
 
         private void Awake()
         {
@@ -41,11 +44,31 @@ namespace Plugins.YandexGamesSDK.Runtime
             {
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
-                InitializeModules();
             }
             else if (_instance != this)
             {
                 Destroy(gameObject);
+            }
+
+#if !UNITY_EDITOR
+        OnYandexGamesSDKReady();
+#endif
+
+            InitializeModules();
+        }
+
+        public void OnSDKInitialized(string message)
+        {
+            if (message == "true")
+            {
+                Debug.Log("Yandex SDK initialized successfully in Unity.");
+                _isInitialized = true;
+            }
+            else
+            {
+                string errorMessage = message.StartsWith("false|") ? message.Substring(6) : "Unknown error";
+                Debug.LogError("Yandex SDK initialization failed in Unity: " + errorMessage);
+                // Handle initialization failure accordingly
             }
         }
 
@@ -54,7 +77,7 @@ namespace Plugins.YandexGamesSDK.Runtime
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
             // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             // Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
-            // CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
+            CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }
 
         private TModule LoadAndInitializeModule<TModule>() where TModule : YGModuleBase

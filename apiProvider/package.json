@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build:dev": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.prod.js && cp dist/sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/",
+    "build:prod": "webpack --config webpack.config.js && cp dist/__sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/ && cp dist/__sdk.js ../Assets/WebGLTemplates/YandexGames/ && cp dist/index.html ../Assets/WebGLTemplates/YandexGames/",
     "watch:dev": "webpack --config webpack.dev.js --watch",
     "build-and-copy": "webpack --config webpack.prod.js && cp dist/sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/"
   },
@@ -13,6 +13,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/node": "^22.7.4",
+    "html-webpack-plugin": "^5.6.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.2",
@@ -21,6 +23,7 @@
   },
   "dependencies": {
     "tslib": "^2.7.0",
+    "unity-loader": "^1.0.11",
     "webpack-merge": "^6.0.1"
   }
 }
