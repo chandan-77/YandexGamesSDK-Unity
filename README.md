@@ -53,9 +53,9 @@ You can easily add the YandexGamesSDK-Unity package to your project using Unity'
 4. Select "Add package from git URL"
 5. Enter the following URL:
    ```
-   https://github.com/your-repo-url.git?path=/Assets/Plugins/YandexGamesSDK
+   https://github.com/playables-studio/YandexGamesSDK-Unity.git?path=/Assets/Plugins/YandexGamesSDK
    ```
-   (Replace `your-repo-url` with the actual URL of your GitHub repository)
+   
 6. Click "Add"
 
 Unity will now download and import the YandexGamesSDK-Unity package into your project.
