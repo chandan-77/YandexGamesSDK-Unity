@@ -10,7 +10,7 @@ window.YandexSDKExports = {
   SavePlayerData: StorageModule.savePlayerData,
   LoadPlayerData: StorageModule.loadPlayerData,
   CheckForInitialization: YandexGamesSDK.checkForInitialization,
-  OnYandexGamesSDKReady: YandexGamesSDK.OnYandexGamesSDKReady
+  OnYandexGamesSDKReady: YandexGamesSDK.OnYandexGamesSDKReady,
 };
 
 window.addEventListener('load', () => {

@@ -39,7 +39,7 @@ export class YandexGamesSDK {
             await YandexGamesSDK.waitForUnityInstance();
             await YandexGamesSDK.waitForYandexGamesSDKReady();
 
-            unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
+            YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
         }
     }
 
@@ -81,8 +81,8 @@ export class YandexGamesSDK {
             // Notify Unity that the SDK and Unity have been initialized
             YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
 
-           (window.yandexSDK as YandexGames.SDK).features.LoadingAPI.ready()
-           
+            (window.yandexSDK as YandexGames.SDK).features.LoadingAPI.ready()
+
         } catch (error: any) {
             console.error('Yandex SDK failed to initialize:', error.message);
 
@@ -96,7 +96,7 @@ export class YandexGamesSDK {
             await YandexGamesSDK.initializeUnity();
 
             // Notify Unity about the initialization failure
-            unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
+            YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
         }
     }
 
@@ -124,7 +124,7 @@ export class YandexGamesSDK {
                 (window as any).createUnityInstance(canvas, config, YandexGamesSDK.updateLoadingProgress)
                     .then((unityInstance: any) => {
                         console.log('Unity WebGL instance created successfully');
-                        unityInstance = unityInstance; // Store instance in the class
+                        YandexGamesSDK.unityInstance = unityInstance; // Store instance in the class
                         (window as any).unityInstance = unityInstance; // Store instance globally if needed
 
                         // Resolve any pending waiters
