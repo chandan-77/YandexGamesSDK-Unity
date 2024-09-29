@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Plugins.YandexGamesSDK.Runtime.Dashboard;
@@ -27,38 +29,28 @@ namespace Plugins.YandexGamesSDK.Editor.BuildProcessors
 
             var config = YandexGamesSDKConfig.Instance;
 
-            if (config.runLocalServerAfterBuild)
+            if (config.OverrideOnBuild)
             {
-                StartLocalServer(report.summary.outputPath);
+                config.SetServerConfiguration(report.summary.outputPath, FindAvailablePort());
             }
         }
-        
-        string GetSdkDevProxyExecutablePath()
+
+        private int FindAvailablePort()
         {
-            string toolsPath = Path.Combine(Application.dataPath, "Tools", "sdk-dev-proxy");
-            string exeName = "";
-            if (Application.platform == RuntimePlatform.WindowsEditor)
-            {
-                exeName = "sdk-dev-proxy-win.exe";
-            }
-            else if (Application.platform == RuntimePlatform.OSXEditor)
-            {
-                exeName = "sdk-dev-proxy-macos";
-            }
-            else if (Application.platform == RuntimePlatform.LinuxEditor)
-            {
-                exeName = "sdk-dev-proxy-linux";
-            }
-            return Path.Combine(toolsPath, exeName);
+            var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return port;
         }
 
 
-        private Process serverProcess;
+        private static Process serverProcess;
 
-        private void StartLocalServer(string buildPath)
+        private static void StartLocalServer(string buildPath)
         {
             var config = YandexGamesSDKConfig.Instance;
-            string port = "8089"; // Use the port you're using
+            string port = "8190"; // Use the port you're using
 
             // Terminate the previous server process if it's still running
             if (serverProcess != null && !serverProcess.HasExited)

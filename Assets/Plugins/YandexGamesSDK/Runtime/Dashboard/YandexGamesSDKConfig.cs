@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Plugins.YandexGamesSDK.Runtime.Singletons;
 using UnityEngine;
@@ -23,7 +24,19 @@ namespace Plugins.YandexGamesSDK.Runtime.Dashboard
         
         [Header("Development Settings")]
         public bool runLocalServerAfterBuild = false;
+        public bool OverrideOnBuild = true; 
+        public string BuildPath; 
+        public int ServerPort = 8080;
 
+        public void SetServerConfiguration(string buildPath, int serverPort)
+        {
+            if (OverrideOnBuild)
+            {
+                BuildPath = buildPath;
+                ServerPort = serverPort;
+            }
+        }
+        
         [System.Serializable]
         public class MockUserProfile
         {
