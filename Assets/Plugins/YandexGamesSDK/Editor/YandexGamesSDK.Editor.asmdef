@@ -1,7 +1,7 @@
 {
   "name": "YandexGamesSDK.Editor",
   "references": [
-    "YandexGamesSDK.Runtime"
+    "GUID:6f07ed758bf54de7a8c5b6d2a778c9a0"
   ],
   "includePlatforms": ["Editor"]
 }
