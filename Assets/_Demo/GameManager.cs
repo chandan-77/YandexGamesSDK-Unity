@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
         public string playerName;
         public string level;
     }
+
     void Start()
     {
         YandexGamesSDK.Instance.Authentication.AuthenticateUser((isAuh, error) =>
@@ -36,12 +37,43 @@ public class GameManager : MonoBehaviour
                 playerName = "SavedPlayer"
             }, delegate { Debug.Log("Player saved."); });
         }
-        
-        
+
+
         if (Input.GetKeyDown(KeyCode.L))
         {
             YandexGamesSDK.Instance.CloudStorage.LoadData("testData",
                 (a, b) => { Debug.Log($"Loading data: {a}, {b}"); });
+        }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            YandexGamesSDK.Instance.Leaderboard.GetLeaderboardEntries("testLeaderboard", 0, 10,
+                (list, s) => { Debug.Log($"Get leaderboard entries: {JsonUtility.ToJson(list)} for {s}"); });
+        }
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            YandexGamesSDK.Instance.Leaderboard.SubmitScore("testLeaderboard", 100,
+                (isSet, error) =>
+                {
+                    if (isSet)
+                    {
+                        Debug.Log("Score submitted");
+                    }
+                    else
+                    {
+                        Debug.Log($"Leaderboard set failed {error}");
+                    }
+                });
+        }
+        
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            YandexGamesSDK.Instance.Leaderboard.GetPlayerEntry("testLeaderboard",
+                (leaderBoard, error) =>
+                {
+                    Debug.Log(JsonUtility.ToJson(leaderBoard));
+                });
         }
     }
 }

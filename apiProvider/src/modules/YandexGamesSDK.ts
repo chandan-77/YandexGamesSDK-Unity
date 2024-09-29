@@ -1,9 +1,7 @@
-import { YandexGames } from "YandexGamesSDK";
 import { Utils } from "../system/utils";
 
 export class YandexGamesSDK {
     private static isInitialized: boolean = false;
-    private static unityInstance: any = null;
     private static unityInitResolve: (() => void) | null = null;
     private static yandexGamesSDKReadyResolve: (() => void) | null = null;
 
@@ -25,7 +23,7 @@ export class YandexGamesSDK {
                 await YandexGamesSDK.waitForYandexGamesSDKReady();
 
                 YandexGamesSDK.isInitialized = true;
-                YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
+                window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
 
                 console.log("Unity initialized successfully on localhost.");
             } else {
@@ -39,7 +37,7 @@ export class YandexGamesSDK {
             await YandexGamesSDK.waitForUnityInstance();
             await YandexGamesSDK.waitForYandexGamesSDKReady();
 
-            YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
         }
     }
 
@@ -49,7 +47,8 @@ export class YandexGamesSDK {
     private static async loadYandexSDK(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
+            // script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
+            script.src = '/sdk.js'; // Yandex SDK URL
             script.onload = () => YandexGamesSDK.onYandexSDKLoaded().then(resolve).catch(reject);
             script.onerror = () => {
                 console.error('Failed to load Yandex SDK script');
@@ -69,19 +68,19 @@ export class YandexGamesSDK {
             (window as any).yandexSDK = sdk;
             console.log('Yandex SDK loaded and initialized successfully');
 
+            await YandexGamesSDK.initializeUnity();
+
             // Wait for unityInstance and YandexGamesSDK to be ready before sending message
             await YandexGamesSDK.waitForUnityInstance();
             await YandexGamesSDK.waitForYandexGamesSDKReady();
 
             YandexGamesSDK.sendUnityMessage('OnYSDKLoaded', 'YSDK loaded successfully');
 
-            await YandexGamesSDK.initializeUnity();
             YandexGamesSDK.isInitialized = true;
 
             // Notify Unity that the SDK and Unity have been initialized
-            YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
 
-            (window.yandexSDK as YandexGames.SDK).features.LoadingAPI.ready()
 
         } catch (error: any) {
             console.error('Yandex SDK failed to initialize:', error.message);
@@ -96,7 +95,7 @@ export class YandexGamesSDK {
             await YandexGamesSDK.initializeUnity();
 
             // Notify Unity about the initialization failure
-            YandexGamesSDK.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
         }
     }
 
@@ -124,7 +123,7 @@ export class YandexGamesSDK {
                 (window as any).createUnityInstance(canvas, config, YandexGamesSDK.updateLoadingProgress)
                     .then((unityInstance: any) => {
                         console.log('Unity WebGL instance created successfully');
-                        YandexGamesSDK.unityInstance = unityInstance; // Store instance in the class
+                        window.unityInstance = unityInstance; // Store instance in the class
                         (window as any).unityInstance = unityInstance; // Store instance globally if needed
 
                         // Resolve any pending waiters
@@ -186,7 +185,7 @@ export class YandexGamesSDK {
      * Waits for the unityInstance to be available.
      */
     private static waitForUnityInstance(): Promise<void> {
-        if (YandexGamesSDK.unityInstance) {
+        if (window.unityInstance) {
             return Promise.resolve();
         }
         return YandexGamesSDK.unityInstancePromise;

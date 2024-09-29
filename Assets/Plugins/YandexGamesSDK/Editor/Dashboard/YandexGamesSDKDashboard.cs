@@ -38,6 +38,7 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
 
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("useMockData"));
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"));
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("isYandexPlatform"));
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"));
 
@@ -53,6 +54,11 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
 
             // Add more sections for other configurations
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("runLocalServerAfterBuild"), new GUIContent("Run Local Server After Build"));
+
+            
             serializedConfig.ApplyModifiedProperties();
         }
 

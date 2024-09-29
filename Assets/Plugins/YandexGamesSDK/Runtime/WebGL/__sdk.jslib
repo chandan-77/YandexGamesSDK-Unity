@@ -44,4 +44,31 @@ mergeInto(LibraryManager.library, {
             console.error('OnYandexGamesSDKReady is not defined on window.YandexSDKExports.');
           }
         },
+
+        SubmitScore: function(leaderboardNamePtr, scorePtr) {
+          if (typeof window.YandexSDKExports.SubmitScore === 'function') {
+            var leaderboardName = UTF8ToString(leaderboardNamePtr), score = UTF8ToString(scorePtr);
+            window.YandexSDKExports.SubmitScore(leaderboardName, score);
+          } else {
+            console.error('SubmitScore is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        GetLeaderboardEntries: function(leaderboardNamePtr, offsetPtr, limitPtr) {
+          if (typeof window.YandexSDKExports.GetLeaderboardEntries === 'function') {
+            var leaderboardName = UTF8ToString(leaderboardNamePtr), offset = UTF8ToString(offsetPtr), limit = UTF8ToString(limitPtr);
+            window.YandexSDKExports.GetLeaderboardEntries(leaderboardName, offset, limit);
+          } else {
+            console.error('GetLeaderboardEntries is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        GetPlayerEntry: function(leaderboardNamePtr) {
+          if (typeof window.YandexSDKExports.GetPlayerEntry === 'function') {
+            var leaderboardName = UTF8ToString(leaderboardNamePtr);
+            window.YandexSDKExports.GetPlayerEntry(leaderboardName);
+          } else {
+            console.error('GetPlayerEntry is not defined on window.YandexSDKExports.');
+          }
+        },
 });

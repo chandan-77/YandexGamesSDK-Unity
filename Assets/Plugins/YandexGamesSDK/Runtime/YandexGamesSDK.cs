@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
+using Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
 using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
 
 namespace Plugins.YandexGamesSDK.Runtime
@@ -35,6 +36,7 @@ namespace Plugins.YandexGamesSDK.Runtime
 
         public IAuthenticationModule Authentication { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
+        public ILeaderboardModule Leaderboard { get; private set; }
 
         private bool _isInitialized = false;
 
@@ -76,7 +78,7 @@ namespace Plugins.YandexGamesSDK.Runtime
         {
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
             // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
-            // Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
+            Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }
 
