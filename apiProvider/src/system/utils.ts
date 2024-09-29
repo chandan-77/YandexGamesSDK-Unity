@@ -4,6 +4,6 @@ export class Utils {
      * @returns {boolean} - Returns true if the environment is localhost, otherwise false.
      */
     static isLocalhost(): boolean {
-        return ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+        return false;//['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
     }
 }

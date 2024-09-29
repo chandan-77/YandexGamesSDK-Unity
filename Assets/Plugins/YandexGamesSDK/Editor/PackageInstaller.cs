@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK
+namespace Plugins.YandexGamesSDK.Editor
 {
     [InitializeOnLoad]
     public static class PackageInstaller
@@ -18,7 +18,7 @@ namespace Plugins.YandexGamesSDK
         /// </summary>
         static void CopyWebGLTemplate()
         {
-            string sourceRelativePath = Path.Combine("YandexGamesSDK", "Runtime", "WebGLTemplates", "YandexGames");
+            string sourceRelativePath = Path.Combine("Runtime", "WebGLTemplates", "YandexGames");
             string destinationPath = Path.Combine(Application.dataPath, "WebGLTemplates", "YandexGames");
 
             string packagePath = GetPackagePath();
@@ -61,7 +61,7 @@ namespace Plugins.YandexGamesSDK
         /// </summary>
         static void CopyConfigAsset()
         {
-            string sourceRelativePath = Path.Combine("YandexGamesSDK", "Runtime", "Resources", "YandexGamesSDKConfig.asset");
+            string sourceRelativePath = Path.Combine("Runtime", "Resources", "YandexGamesSDKConfig.asset");
             string destinationDir = Path.Combine(Application.dataPath, "YandexGamesSDK", "Resources");
             string destinationPath = Path.Combine(destinationDir, "YandexGamesSDKConfig.asset");
 

@@ -3,7 +3,7 @@ using System;
 namespace Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
 {
     [Serializable]
-    public class LeaderboardEntry
+    public record LeaderboardEntry
     {
         public int rank;            // Player's rank on the leaderboard
         public string playerId;     // Unique identifier of the player
