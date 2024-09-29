@@ -1,66 +1,46 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const GenerateJSLibPlugin = require('./webpack-plugins/GenerateJSLibPlugin');
+const { DefinePlugin } = require('webpack');
 
-const sdkConfig = {
-  entry: './src/index.ts',
+const sdkVersion = require('./package.json').version || '1.0.0';
+
+module.exports = {
+  entry: './src/index.ts', 
   output: {
-    filename: '__sdk.js',
-    path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'window',
+    filename: '__sdk.js',  
+    path: path.resolve(__dirname, 'dist'), 
+    libraryTarget: 'window', 
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js'], 
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.ts$/,  
         loader: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
   },
-  mode: 'production',
   plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      filename: 'index.html',
+      inject: 'body',
+      minify: false,
+      templateParameters: {
+        sdkVersion: sdkVersion,
+      }
+    }),
+    new DefinePlugin({
+      YANDEX_SDK_VERSION: JSON.stringify(sdkVersion),
+    }),
     new GenerateJSLibPlugin({
       sourceFilePath: path.resolve(__dirname, 'src/index.ts'),
-      outputFilePath: path.resolve(__dirname, 'dist/__sdk.jslib'),
+      outputFilePath: path.resolve(__dirname, 'dist/__sdk.jslib'),  
     }),
   ],
+  mode: 'production',  
 };
-
-module.exports = sdkConfig;
-
-// const libConfig = {
-//   entry: './src/lib.ts',
-//   output: {
-//     filename: '__sdk.jslib',
-//     path: path.resolve(__dirname, 'dist'),
-//     library: {
-//       name: 'LibraryManager.library',
-//       type: 'assign-properties',
-//     },
-//     iife: false, // Disable IIFE wrapping
-//   },
-//   resolve: {
-//     extensions: ['.ts', '.js'],
-//   },
-//   module: {
-//     rules: [
-//       {
-//         test: /.ts$/,
-//         use: {
-//           loader: 'ts-loader',
-//           options: {
-//             compilerOptions: {
-//             },
-//           },
-//         },
-//         exclude: /node_modules/,
-//       },
-//     ],
-//   },
-//   mode: 'production',
-// };
-
-// module.exports = [sdkConfig, libConfig];

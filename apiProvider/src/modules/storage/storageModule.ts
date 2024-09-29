@@ -1,41 +1,51 @@
+import { Utils } from "../../system/utils";
 import { YandexGames } from "YandexGamesSDK";
 
 export class StorageModule {
-    static async savePlayerData(key: string, data: string): Promise<void> {
+    static async savePlayerData(key: string, data: string, flush: boolean = true): Promise<void> {
         try {
-            const player = await window.yandexSDK.getPlayer(); // Cast window to any to get the Yandex SDK player instance
-
-            // Set the data as a key-value object
-            await player.setData({ [key]: data }, true); // flush=true to ensure immediate data saving
-
-            // Notify Unity about successful data saving
-            unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', 'true');
+            if (!Utils.isLocalhost()) {
+                const player = await window.yandexSDK.getPlayer();
+                await player.setData({ [key]: data }, flush);
+                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', 'true');
+            } else {
+                localStorage.setItem(key, data);
+                console.log(`Saved player data locally for key: ${key}`);
+                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', 'true');
+            }
         } catch (error: any) {
             console.error("Failed to save player data:", error.message);
-            // Notify Unity about failure, including the error message
             unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', `false|${error.message}`);
         }
     }
 
     static async loadPlayerData(key: string): Promise<void> {
         try {
-            const player:YandexGames.Player = await window.yandexSDK.getPlayer(); // Cast window to any to get the Yandex SDK player instance
+            if (!Utils.isLocalhost()) {
+                const player = await window.yandexSDK.getPlayer();
+                const result = await player.getData([key]);
 
-            // Fetch the data for the given key
-            const data = await player.getData([key]);
-
-            console.log(data);
-
-            if (data !== undefined) {
-                // If the data for the key is found, send it back to Unity
-                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', JSON.stringify({ success: true, data: data[key] }));
+                if (result && result.hasOwnProperty(key)) {
+                    const data = result[key];
+                    console.log(`Loaded player data from Yandex for key: ${key}`, data);
+                    unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', JSON.stringify({ success: true, data }));
+                } else {
+                    console.warn(`No data found in Yandex for key: ${key}`);
+                    unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', 'false|No data found for the given key');
+                }
             } else {
-                // If no data is found, notify Unity
-                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', 'false|No data found for the given key');
+                // Load data from localStorage for localhost
+                const data = localStorage.getItem(key);
+                if (data !== null) {
+                    console.log(`Loaded player data locally for key: ${key}`, data);
+                    unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', JSON.stringify({ success: true, data }));
+                } else {
+                    console.warn(`No data found locally for key: ${key}`);
+                    unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', 'false|No data found for the given key');
+                }
             }
         } catch (error: any) {
             console.error("Failed to load player data:", error.message);
-            // Notify Unity about failure, including the error message
             unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', `false|${error.message}`);
         }
     }

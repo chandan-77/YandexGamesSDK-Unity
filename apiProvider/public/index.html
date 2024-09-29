@@ -1,8 +1,12 @@
+<!-- Yandex Games SDK for Unity - index.html Template -->
+<!-- SDK Version: <%= sdkVersion %> -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
+    <title>Unity WebGL Player</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Favicon -->
     <link rel="shortcut icon" href="/favicon.ico">
@@ -10,8 +14,8 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     <style>
-        /* Include necessary CSS styles */
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -19,16 +23,19 @@
             overflow: hidden;
             background-color: black;
         }
+
         #unity-container {
             width: 100%;
             height: 100%;
             position: relative;
         }
+
         #unity-canvas {
             width: 100%;
             height: 100%;
             background: black;
         }
+
         #loading-cover {
             position: absolute;
             width: 100%;
@@ -40,11 +47,13 @@
             justify-content: center;
             align-items: center;
         }
+
         #unity-loading-bar {
             width: 50%;
             max-width: 600px;
             min-width: 200px;
         }
+
         #unity-logo {
             width: 100%;
             height: auto;
@@ -52,6 +61,7 @@
             background: url('UnityLogo.png') no-repeat center;
             background-size: contain;
         }
+
         .spinner {
             border: 8px solid #f3f3f3;
             border-top: 8px solid #444444;
@@ -61,10 +71,17 @@
             animation: spin 1.5s linear infinite;
             margin: 0 auto;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         #unity-fullscreen-button {
             position: absolute;
             bottom: 10px;
@@ -74,19 +91,24 @@
     </style>
 </head>
 
-<body class="%SPLASH_SCREEN_STYLE%">
-<div id="unity-container" class="unity-desktop">
-    <canvas id="unity-canvas"></canvas>
-    <div id="loading-cover" style="display: none;">
-        <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div class="spinner"></div>
+<body class="<%- '%SPLASH_SCREEN_STYLE%' %>">
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas"></canvas>
+        <div id="loading-cover" style="display: none;">
+            <div id="unity-loading-bar">
+                <div id="unity-logo"></div>
+                <div class="spinner"></div>
+            </div>
         </div>
     </div>
-</div>
-<div id="unity-fullscreen-button"></div>
+    <div id="unity-fullscreen-button"></div>
 
-<script src="__sdk.js"></script>
+    <script>
+        if (window.YandexSDKVersion !== '<%= sdkVersion %>') {
+            console.warn('Yandex SDK version mismatch!');
+        }
+    </script>
 
 </body>
+
 </html>

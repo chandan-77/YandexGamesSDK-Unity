@@ -1,21 +1,21 @@
+<!-- Yandex Games SDK for Unity - index.html Template -->
+<!-- SDK Version: 1.0.0 -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
+    <title>Unity WebGL Player</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Favicon -->
     <link rel="shortcut icon" href="/favicon.ico">
     <!-- Robots Meta Tag -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <!-- Include Yandex SDK -->
-<!--    <script src="https://yandex.ru/games/sdk/v2"></script>-->
-    <script src="__sdk.js"></script>
-    
-    <!-- Styles -->
+
     <style>
-        /* Include necessary CSS styles */
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -23,16 +23,19 @@
             overflow: hidden;
             background-color: black;
         }
+
         #unity-container {
             width: 100%;
             height: 100%;
             position: relative;
         }
+
         #unity-canvas {
             width: 100%;
             height: 100%;
             background: black;
         }
+
         #loading-cover {
             position: absolute;
             width: 100%;
@@ -44,11 +47,13 @@
             justify-content: center;
             align-items: center;
         }
+
         #unity-loading-bar {
             width: 50%;
             max-width: 600px;
             min-width: 200px;
         }
+
         #unity-logo {
             width: 100%;
             height: auto;
@@ -56,6 +61,7 @@
             background: url('UnityLogo.png') no-repeat center;
             background-size: contain;
         }
+
         .spinner {
             border: 8px solid #f3f3f3;
             border-top: 8px solid #444444;
@@ -65,10 +71,17 @@
             animation: spin 1.5s linear infinite;
             margin: 0 auto;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
         #unity-fullscreen-button {
             position: absolute;
             bottom: 10px;
@@ -79,106 +92,23 @@
 </head>
 
 <body class="%SPLASH_SCREEN_STYLE%">
-<div id="unity-container" class="unity-desktop">
-    <canvas id="unity-canvas"></canvas>
-    <div id="loading-cover" style="display: none;">
-        <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div class="spinner"></div>
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas"></canvas>
+        <div id="loading-cover" style="display: none;">
+            <div id="unity-loading-bar">
+                <div id="unity-logo"></div>
+                <div class="spinner"></div>
+            </div>
         </div>
     </div>
-</div>
-<div id="unity-fullscreen-button"></div>
+    <div id="unity-fullscreen-button"></div>
 
-<script>
+    <script>
+        if (window.YandexSDKVersion !== '1.0.0') {
+            console.warn('Yandex SDK version mismatch!');
+        }
+    </script>
 
- 
-    //
-    // // Initialize the Yandex SDK
-    // YaGames.init()
-    //     .then(function(ysdk) {
-    //         window.ysdk = ysdk;  // Store the SDK globally
-    //         console.log("YSDK Loaded");
-    //    
-    //          const hideFullScreenButton = "{{{ HIDE_FULL_SCREEN_BUTTON }}}";
-    //
-    //         // Now load the Unity game
-    //         var buildUrl = "Build";
-    //         var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
-    //         var config = {
-    //             dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-    //             frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-    //             codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
-    //             #if MEMORY_FILENAME
-    //             memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
-    //             #endif
-    //             #if SYMBOLS_FILENAME
-    //             symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
-    //             #endif
-    //             streamingAssetsUrl: "StreamingAssets",
-    //             companyName: "{{{ COMPANY_NAME }}}",
-    //             productName: "{{{ PRODUCT_NAME }}}",
-    //             productVersion: "{{{ PRODUCT_VERSION }}}",
-    //         };
-    //
-    //         const container = document.querySelector("#unity-container");
-    //         const canvas = document.querySelector("#unity-canvas");
-    //         const loadingCover = document.querySelector("#loading-cover");
-    //         const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-    //
-    //         const canFullscreen = (function() {
-    //             for (const key of [
-    //                 'exitFullscreen',
-    //                 'webkitExitFullscreen',
-    //                 'webkitCancelFullScreen',
-    //                 'mozCancelFullScreen',
-    //                 'msExitFullscreen',
-    //             ]) {
-    //                 if (key in document) {
-    //                     return true;
-    //                 }
-    //             }
-    //             return false;
-    //         }());
-    //
-    //         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    //             container.className = "unity-mobile";
-    //             config.devicePixelRatio = 1;
-    //         }
-    //         #if BACKGROUND_FILENAME
-    //         canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
-    //         #endif
-    //         loadingCover.style.display = "";
-    //
-    //         const script = document.createElement("script");
-    //         script.src = loaderUrl;
-    //         script.onload = () => {
-    //             createUnityInstance(canvas, config, (progress) => {
-    //                 // Update progress bar or spinner if necessary
-    //             }).then((unityInstance) => {
-    //                 loadingCover.style.display = "none";
-    //                 if (canFullscreen) {
-    //                     if (!hideFullScreenButton) {
-    //                         fullscreenButton.style.display = "";
-    //                     }
-    //                     fullscreenButton.onclick = () => {
-    //                         unityInstance.SetFullscreen(1);
-    //                     };
-    //                 }
-    //             }).catch((message) => {
-    //                 alert("Failed to load Unity game: " + message);
-    //             });
-    //         };
-    //         script.onerror = function () {
-    //             alert("Failed to load Unity loader script");
-    //         };
-    //         document.body.appendChild(script);
-    //
-    //     })
-    //     .catch(function (error) {
-    //         console.error("YSDK Failed to load:", error.message);
-    //         alert("Failed to initialize Yandex SDK: " + error.message);
-    //     });
-</script>
-</body>
+<script defer src="__sdk.js"></script></body>
+
 </html>
