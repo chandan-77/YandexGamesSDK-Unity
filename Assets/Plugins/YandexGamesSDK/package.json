@@ -1,6 +1,6 @@
 {
   "name": "com.playables-studio.yandexgames-sdk",
-  "version": "1.0.0",
+  "version": "1.1.0-beta",
   "displayName": "Yandex Games Unity SDK",
   "description": "A Unity plugin for YandexGames integration.",
   "unity": "2020.3",
