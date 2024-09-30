@@ -2,59 +2,65 @@ using System;
 using System.Collections.Generic;
 using Plugins.YandexGamesSDK.Runtime.Singletons;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Plugins.YandexGamesSDK.Runtime.Dashboard
 {
+    [Serializable]
+    public record DevelopmentSettings
+    {
+        public bool runLocalServerAfterBuild = false;
+        public bool overrideOnBuild = true;
+        public string buildPath;
+        public int serverPort = 8080;
+    }
+
+    [Serializable]
+    public record MockDataSettings
+    {
+        [Header("Mock User Profile")] public MockUserProfile mockUserProfile;
+
+        [Header("Mock Leaderboard Data")] public List<MockLeaderboardEntry> mockLeaderboardEntries;
+    }
+
+    [Serializable]
+    public record MockUserProfile
+    {
+        public string id;
+        public string name;
+        public bool isAuthorized;
+        public string avatarUrlSmall;
+        public string avatarUrlMedium;
+        public string avatarUrlLarge;
+    }
+
+    [Serializable]
+    public record MockLeaderboardEntry
+    {
+        public string playerId;
+        public string playerName;
+        public int score;
+    }
+
     [CreateAssetMenu(fileName = "YandexGamesSDKConfig", menuName = "Yandex Games SDK/Config", order = 1)]
     public class YandexGamesSDKConfig : ScriptableObjectSingleton<YandexGamesSDKConfig>
     {
-        [Header("General Settings")]
-        public string appID = "YOUR_GAME_ID";
-        public bool useMockData = true;
+        [Header("General Settings")] public string appID = "YOUR_GAME_ID";
         public bool isYandexPlatform = false;
         public bool verboseLogging = false;
 
-        [Header("Mock User Profile")]
-        public MockUserProfile mockUserProfile;
+        public bool useMockData = true;
+        [Header("Mock Settings")] public MockDataSettings mockData;
 
-        [Header("Mock Leaderboard Data")]
-        public List<MockLeaderboardEntry> mockLeaderboardEntries;
-
-        // Add other settings as needed
-        
-        [Header("Development Settings")]
-        public bool runLocalServerAfterBuild = false;
-        public bool OverrideOnBuild = true; 
-        public string BuildPath; 
-        public int ServerPort = 8080;
+        [Header("Development Settings")] public DevelopmentSettings developmentSettings;
 
         public void SetServerConfiguration(string buildPath, int serverPort)
         {
-            if (OverrideOnBuild)
+            if (developmentSettings.overrideOnBuild)
             {
-                BuildPath = buildPath;
-                ServerPort = serverPort;
+                developmentSettings.buildPath = buildPath;
+                developmentSettings.serverPort = serverPort;
             }
         }
-        
-        [System.Serializable]
-        public class MockUserProfile
-        {
-            public string id;
-            public string name;
-            public bool isAuthorized;
-            public string avatarUrlSmall;
-            public string avatarUrlMedium;
-            public string avatarUrlLarge;
-        }
-
-        [System.Serializable]
-        public class MockLeaderboardEntry
-        {
-            public string playerId;
-            public string playerName;
-            public int score;
-        }
     }
-
 }

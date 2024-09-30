@@ -1,8 +1,6 @@
 using Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEngine;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Plugins.YandexGamesSDK.Editor.Dashboard
 {
@@ -26,7 +24,6 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             _localServerManager = new LocalServerManager();
             _localServerManager.OnLogUpdate += UpdateLogs;
 
-            // Register to cleanup when Unity closes or the window is destroyed
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.quitting += OnQuitting;
         }
@@ -42,10 +39,11 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
 
         private void OnGUI()
         {
+            EditorGUILayout.Space();
+
             if (config == null)
             {
-                EditorGUILayout.HelpBox("YandexGamesSDKConfig asset not found. Please create one.",
-                    MessageType.Warning);
+                EditorGUILayout.HelpBox("YandexGamesSDKConfig asset not found. Please create one.", MessageType.Warning);
 
                 if (GUILayout.Button("Create Config Asset"))
                 {
@@ -55,49 +53,51 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
                 return;
             }
 
+            // Display Config Asset Field
+            EditorGUILayout.LabelField("Configuration", EditorStyles.boldLabel);
+            config = (YandexGamesSDKConfig)EditorGUILayout.ObjectField("Config Asset", config, typeof(YandexGamesSDKConfig), false);
+
+            EditorGUILayout.Space();
+
+            // Begin displaying config properties
             SerializedObject serializedConfig = new SerializedObject(config);
+            serializedConfig.Update();
 
+            // General Settings
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("useMockData"));
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"));
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("isYandexPlatform"));
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"));
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"), new GUIContent("App ID"));
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("isYandexPlatform"), new GUIContent("Is Yandex Platform"));
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"), new GUIContent("Verbose Logging"));
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Mock User Profile", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("mockUserProfile"), true);
+            // Mock Data
+            EditorGUILayout.LabelField("Mock Data", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("useMockData"), new GUIContent("Use Mock Data"));
+            if (config.useMockData)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(serializedConfig.FindProperty("mockData"), true);
+                EditorGUI.indentLevel--;
+            }
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Mock Leaderboard Entries", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("mockLeaderboardEntries"), true);
-
-            // Add more sections for other configurations
-
-            EditorGUILayout.Space();
+            // Development Settings
             EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
-            
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("runLocalServerAfterBuild"), new GUIContent("Run Local Server After Build"));
-
-            // Add fields for server parameters
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Server Configuration", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("OverrideOnBuild"), new GUIContent("Override On Build"));
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Build Path:");
-            config.BuildPath = EditorGUILayout.TextField(config.BuildPath);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Server Port:");
-            config.ServerPort = EditorGUILayout.IntField(config.ServerPort, GUILayout.Width(100));
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("developmentSettings"), true);
 
             serializedConfig.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
+
+            // Rest of your dashboard code (Server Controls, Logs, etc.)
+            DrawServerControls();
+            DrawServerLogs();
+        }
+
+        private void DrawServerControls()
+        {
             EditorGUILayout.LabelField("Local Server Controls", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginHorizontal();
@@ -112,17 +112,7 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             {
                 if (GUILayout.Button("Start Server"))
                 {
-                    string buildPath = config.BuildPath;
-                    string appId = config.appID;
-                    string port = config.ServerPort.ToString();
-
-                    if (string.IsNullOrEmpty(buildPath))
-                    {
-                        EditorUtility.DisplayDialog("Error", "Build Path is not set.", "OK");
-                        return;
-                    }
-
-                    _localServerManager.StartLocalServer(buildPath, port);
+                    StartServer();
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -142,32 +132,58 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
                 GUILayout.Label("Stopped", statusStyle);
             }
             EditorGUILayout.EndHorizontal();
+        }
 
+        private void DrawServerLogs()
+        {
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Server Logs", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginHorizontal();
             autoScroll = GUILayout.Toggle(autoScroll, "Auto-Scroll", GUILayout.Width(100));
+            if (GUILayout.Button("Clear Logs"))
+            {
+                _localServerManager.ClearLogs();
+                logText = "";
+            }
             EditorGUILayout.EndHorizontal();
 
             logScrollPos = EditorGUILayout.BeginScrollView(logScrollPos, GUILayout.Height(300));
             EditorGUILayout.TextArea(logText, GUILayout.ExpandHeight(true));
             EditorGUILayout.EndScrollView();
+
+            // Repaint to update UI
+            if (autoScroll)
+            {
+                Repaint();
+            }
+        }
+
+        private void StartServer()
+        {
+            string buildPath = config.developmentSettings.buildPath;
+            string port = config.developmentSettings.serverPort.ToString();
+
+            if (string.IsNullOrEmpty(buildPath))
+            {
+                EditorUtility.DisplayDialog("Error", "Build Path is not set.", "OK");
+                return;
+            }
+
+            _localServerManager.StartLocalServer(buildPath, port);
         }
 
         private void UpdateLogs()
         {
             logText = _localServerManager.Logs;
-            if (autoScroll)
-            {
-                // Force the GUI to update scroll position to the bottom
-                Repaint();
-            }
         }
 
         private void LoadConfig()
         {
-            config = Resources.Load<YandexGamesSDKConfig>("YandexGamesSDKConfig");
+            if (config == null)
+            {
+                config = Resources.Load<YandexGamesSDKConfig>("YandexGamesSDKConfig");
+            }
 
             if (config == null)
             {
@@ -188,7 +204,6 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
         {
             if (state == PlayModeStateChange.ExitingEditMode)
             {
-                // Optionally, stop the server when entering play mode
                 _localServerManager.StopServer();
             }
         }
