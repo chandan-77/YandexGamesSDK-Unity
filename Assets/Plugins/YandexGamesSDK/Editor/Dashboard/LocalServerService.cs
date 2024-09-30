@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Text;
 using Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 
 namespace Plugins.YandexGamesSDK.Editor.Dashboard
 {
@@ -20,6 +19,9 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
         // Event to notify log updates
         public event Action OnLogUpdate;
 
+        /// <summary>
+        /// Starts the local server using npx and the specified build path and port.
+        /// </summary>
         public async void StartLocalServer(string buildPath, string port)
         {
             var config = YandexGamesSDKConfig.Instance;
@@ -34,26 +36,38 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
                 UnityEngine.Debug.Log("Previous server process terminated.");
             }
 
-            string npxPath = "/opt/homebrew/bin/npx"; // Full path to npx
-            string nodeDirectory = "/opt/homebrew/bin"; // Directory containing node, npm, npx
+            string nodeExecutable = FindNodePath();
+            if (string.IsNullOrEmpty(nodeExecutable))
+            {
+                UnityEngine.Debug.LogError(
+                    "Unable to find 'node'. Please ensure that Node.js is installed and available in your system PATH.");
+                return;
+            }
 
-            string arguments = $"@yandex-games/sdk-dev-proxy -p \"{buildPath}\" --app-id={config.appID} --port={port} -l";
+            string npxPath = FindNpxPath();
+
+            if (string.IsNullOrEmpty(npxPath))
+            {
+                UnityEngine.Debug.LogError(
+                    "Unable to find 'npx'. Please ensure that Node.js and npm are installed and 'npx' is available in your system PATH.");
+                return;
+            }
+
+            string arguments =
+                $"@yandex-games/sdk-dev-proxy -p \"{buildPath}\" --app-id={config.appID} --port={port} -l";
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
-                FileName = npxPath,
-                Arguments = arguments,
+                FileName = nodeExecutable,
+                Arguments = $"\"{npxPath}\" {arguments}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow = false,
+                CreateNoWindow = true,
                 WorkingDirectory = buildPath,
             };
 
-            // Update PATH
-            string currentPath = startInfo.EnvironmentVariables["PATH"];
-            startInfo.EnvironmentVariables["PATH"] = $"{nodeDirectory}:{currentPath}";
-
+            // Log the PATH for debugging purposes
             UnityEngine.Debug.Log("Process PATH: " + startInfo.EnvironmentVariables["PATH"]);
 
             try
@@ -110,6 +124,127 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             }
         }
 
+        /// <summary>
+        /// Finds the path to 'node' dynamically by checking the system PATH and common install locations.
+        /// </summary>
+        private string FindNodePath()
+        {
+            string nodeExecutableName = "node";
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                nodeExecutableName = "node.exe"; // On Windows, 'node' is 'node.exe'
+            }
+
+            // First, try to find 'node' in the system PATH
+            string pathEnv = Environment.GetEnvironmentVariable("PATH");
+            string[] paths = pathEnv.Split(Path.PathSeparator);
+
+            foreach (string path in paths)
+            {
+                string fullPath = Path.Combine(path, nodeExecutableName);
+                if (File.Exists(fullPath))
+                {
+                    UnityEngine.Debug.Log("Found node at: " + fullPath);
+                    return fullPath;
+                }
+            }
+
+            // If not found, check common installation directories
+            string[] commonPaths;
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                commonPaths = new string[]
+                {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs"),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "nodejs"),
+                };
+            }
+            else // macOS and Linux
+            {
+                commonPaths = new string[]
+                {
+                    "/usr/local/bin",
+                    "/usr/bin",
+                    "/opt/homebrew/bin",
+                };
+            }
+
+            foreach (string dir in commonPaths)
+            {
+                string fullPath = Path.Combine(dir, nodeExecutableName);
+                if (File.Exists(fullPath))
+                {
+                    UnityEngine.Debug.Log("Found node at: " + fullPath);
+                    return fullPath;
+                }
+            }
+
+            // Not found
+            return null;
+        }
+
+        /// <summary>
+        /// Finds the path to 'npx' dynamically by checking the system PATH and common install locations.
+        /// </summary>
+        private string FindNpxPath()
+        {
+            string npxExecutableName = "npx";
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                npxExecutableName = "npx.cmd"; // On Windows, 'npx' is 'npx.cmd'
+            }
+
+            // First, try to find 'npx' in the system PATH
+            string pathEnv = Environment.GetEnvironmentVariable("PATH");
+            string[] paths = pathEnv.Split(Path.PathSeparator);
+
+            foreach (string path in paths)
+            {
+                string fullPath = Path.Combine(path, npxExecutableName);
+                if (File.Exists(fullPath))
+                {
+                    UnityEngine.Debug.Log("Found npx at: " + fullPath);
+                    return fullPath;
+                }
+            }
+
+            // If not found, check common installation directories
+            string[] commonPaths;
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                commonPaths = new string[]
+                {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs"),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "nodejs"),
+                };
+            }
+            else // MacOS and Linux
+            {
+                commonPaths = new string[]
+                {
+                    "/usr/local/bin",
+                    "/usr/bin",
+                    "/opt/homebrew/bin",
+                };
+            }
+
+            foreach (string dir in commonPaths)
+            {
+                string fullPath = Path.Combine(dir, npxExecutableName);
+                if (File.Exists(fullPath))
+                {
+                    UnityEngine.Debug.Log("Found npx at: " + fullPath);
+                    return fullPath;
+                }
+            }
+
+            // Not found
+            return null;
+        }
+
+        /// <summary>
+        /// Stops the local server if it's running.
+        /// </summary>
         public void StopServer()
         {
             if (IsRunning)
@@ -138,6 +273,19 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             }
         }
 
+        /// <summary>
+        /// Clears the current logs.
+        /// </summary>
+        public void ClearLogs()
+        {
+            logBuilder.Clear();
+            OnLogUpdate?.Invoke();
+            UnityEngine.Debug.Log("Logs have been cleared.");
+        }
+
+        /// <summary>
+        /// Finds an available port on the local machine.
+        /// </summary>
         public static int FindAvailablePort()
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -147,6 +295,9 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             return port;
         }
 
+        /// <summary>
+        /// Cleans up the server process when the application quits.
+        /// </summary>
         public void Cleanup()
         {
             if (IsRunning)

@@ -29,7 +29,7 @@ namespace Plugins.YandexGamesSDK.Editor.BuildProcessors
 
             var config = YandexGamesSDKConfig.Instance;
 
-            if (config.OverrideOnBuild)
+            if (config.developmentSettings.overrideOnBuild)
             {
                 config.SetServerConfiguration(report.summary.outputPath, FindAvailablePort());
             }

@@ -13,15 +13,20 @@ MonoBehaviour:
   m_Name: YandexGamesSDKConfig
   m_EditorClassIdentifier: 
   appID: 376093
-  useMockData: 1
   isYandexPlatform: 0
   verboseLogging: 1
-  mockUserProfile:
-    id: 
-    name: 
-    isAuthorized: 0
-    avatarUrlSmall: 
-    avatarUrlMedium: 
-    avatarUrlLarge: 
-  mockLeaderboardEntries: []
-  runLocalServerAfterBuild: 1
+  useMockData: 1
+  mockData:
+    mockUserProfile:
+      id: 
+      name: 
+      isAuthorized: 0
+      avatarUrlSmall: 
+      avatarUrlMedium: 
+      avatarUrlLarge: 
+    mockLeaderboardEntries: []
+  developmentSettings:
+    runLocalServerAfterBuild: 0
+    overrideOnBuild: 1
+    buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
+    serverPort: 61737
