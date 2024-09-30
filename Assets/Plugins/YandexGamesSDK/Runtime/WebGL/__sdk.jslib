@@ -45,6 +45,24 @@ mergeInto(LibraryManager.library, {
           }
         },
 
+        GetServerTime: function() {
+          if (typeof window.YandexSDKExports.GetServerTime === 'function') {
+            
+            window.YandexSDKExports.GetServerTime();
+          } else {
+            console.error('GetServerTime is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        GetEnvironment: function() {
+          if (typeof window.YandexSDKExports.GetEnvironment === 'function') {
+            
+            window.YandexSDKExports.GetEnvironment();
+          } else {
+            console.error('GetEnvironment is not defined on window.YandexSDKExports.');
+          }
+        },
+
         SubmitScore: function(leaderboardNamePtr, scorePtr) {
           if (typeof window.YandexSDKExports.SubmitScore === 'function') {
             var leaderboardName = UTF8ToString(leaderboardNamePtr), score = UTF8ToString(scorePtr);
@@ -69,6 +87,69 @@ mergeInto(LibraryManager.library, {
             window.YandexSDKExports.GetPlayerEntry(leaderboardName);
           } else {
             console.error('GetPlayerEntry is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        SetGameplayReady: function() {
+          if (typeof window.YandexSDKExports.SetGameplayReady === 'function') {
+            
+            window.YandexSDKExports.SetGameplayReady();
+          } else {
+            console.error('SetGameplayReady is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        SetGameplayStart: function() {
+          if (typeof window.YandexSDKExports.SetGameplayStart === 'function') {
+            
+            window.YandexSDKExports.SetGameplayStart();
+          } else {
+            console.error('SetGameplayStart is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        SetGameplayStop: function() {
+          if (typeof window.YandexSDKExports.SetGameplayStop === 'function') {
+            
+            window.YandexSDKExports.SetGameplayStop();
+          } else {
+            console.error('SetGameplayStop is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        HideBannerAd: function() {
+          if (typeof window.YandexSDKExports.HideBannerAd === 'function') {
+            
+            window.YandexSDKExports.HideBannerAd();
+          } else {
+            console.error('HideBannerAd is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        ShowBannerAd: function(positionPtr) {
+          if (typeof window.YandexSDKExports.ShowBannerAd === 'function') {
+            var position = UTF8ToString(positionPtr);
+            window.YandexSDKExports.ShowBannerAd(position);
+          } else {
+            console.error('ShowBannerAd is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        ShowInterstitialAd: function() {
+          if (typeof window.YandexSDKExports.ShowInterstitialAd === 'function') {
+            
+            window.YandexSDKExports.ShowInterstitialAd();
+          } else {
+            console.error('ShowInterstitialAd is not defined on window.YandexSDKExports.');
+          }
+        },
+
+        ShowRewardedAd: function() {
+          if (typeof window.YandexSDKExports.ShowRewardedAd === 'function') {
+            
+            window.YandexSDKExports.ShowRewardedAd();
+          } else {
+            console.error('ShowRewardedAd is not defined on window.YandexSDKExports.');
           }
         },
 });

@@ -1,9 +1,12 @@
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
 using Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
 using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
+using Plugins.YandexGamesSDK.Runtime.Types;
 
 namespace Plugins.YandexGamesSDK.Runtime
 {
@@ -34,9 +37,20 @@ namespace Plugins.YandexGamesSDK.Runtime
         [DllImport("__Internal")]
         private static extern void OnYandexGamesSDKReady();
 
+        [DllImport("__Internal")]
+        private static extern void GetServerTime();
+
+        [DllImport("__Internal")]
+        private static extern void GetEnvironment();
+
+        private Action<bool, TimeSpan> getServerTimeCallback;
+        private Action<bool, EnvironmentData> getEnvironmetCallback;
+
+
         public IAuthenticationModule Authentication { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
         public ILeaderboardModule Leaderboard { get; private set; }
+        public IAdvertisementModule Advertisement { get; private set; }
 
         private bool _isInitialized = false;
 
@@ -52,11 +66,70 @@ namespace Plugins.YandexGamesSDK.Runtime
                 Destroy(gameObject);
             }
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && !UNITY_EDITOR
         OnYandexGamesSDKReady();
 #endif
 
             InitializeModules();
+        }
+
+        public void GetServerTime(Action<bool, TimeSpan> callback)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            getServerTimeCallback = callback;
+            GetServerTime();
+#else
+            Debug.Log("GetServerTime is only available in WebGL builds.");
+            callback(false, TimeSpan.Zero);
+#endif
+        }
+
+        public void GetEnvironment(Action<bool, EnvironmentData> callback)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            getEnvironmetCallback = callback;
+            GetEnvironment();
+#else
+            Debug.Log("GetEnvironment is only available in WebGL builds.");
+            callback(false, null);
+#endif
+        }
+
+        public void OnGetServerTimeSuccess(string serverTime)
+        {
+            Debug.Log($"Server Time Retrieved: {serverTime}");
+
+            if (TimeSpan.TryParse(serverTime, out TimeSpan serverTimeParsed))
+            {
+                getServerTimeCallback?.Invoke(true, serverTimeParsed);
+                return;
+            }
+
+            Debug.Log($"Failed to parse server time: {serverTime}");
+        }
+
+        public void OnGetServerTimeFailure(string error)
+        {
+            Debug.LogError($"Failed to get server time: {error}");
+
+            getServerTimeCallback?.Invoke(false, TimeSpan.Zero);
+        }
+
+        public void OnGetEnvironmentSuccess(string environment)
+        {
+            Debug.Log($"Environment Retrieved: {environment}");
+
+            var data = JsonUtility.FromJson<Root>(environment);
+
+            Debug.Log($"Environment Retrieved: {JsonUtility.ToJson(data.env)}");
+            getEnvironmetCallback?.Invoke(true, data.env);
+        }
+
+        public void OnGetEnvironmentFailure(string error)
+        {
+            Debug.LogError($"Failed to get environment: {error}");
+
+            getEnvironmetCallback?.Invoke(false, null);
         }
 
         public void OnSDKInitialized(string message)
@@ -77,7 +150,7 @@ namespace Plugins.YandexGamesSDK.Runtime
         private void InitializeModules()
         {
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
-            // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
+            Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }

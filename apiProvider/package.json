@@ -1,14 +1,13 @@
 {
   "name": "apiprovider",
-  "version": "1.1.0-beta",
-  
+  "version": "1.1.1-beta",
   "main": "index.js",
   "scripts": {
-    "build:dev": "webpack --config webpack.dev.js",
-    "build:prod": "webpack --config webpack.config.js && cp dist/__sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/ && cp dist/__sdk.js ../Assets/WebGLTemplates/YandexGames/ && cp dist/index.html ../Assets/WebGLTemplates/YandexGames/ && cp dist/__sdk.js ../Assets/Plugins/YandexGamesSDK/Runtime/WebGLTemplates/YandexGames/ && cp dist/index.html ../Assets/Plugins/YandexGamesSDK/Runtime/WebGLTemplates/YandexGames/",
-    "build:sdk-dev-proxy": "pkg sdk-dev-proxy.js --output dist/sdk-dev-proxy --targets node16-win-x64,node16-macos-x64,node16-linux-x64",
-    "watch:dev": "webpack --config webpack.dev.js --watch",
-    "build-and-copy": "webpack --config webpack.prod.js && cp dist/sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/"
+    "build:prod": "webpack --config webpack.config.js",
+    "copy:template:prod": "cp dist/__sdk.js ../Assets/Plugins/YandexGamesSDK/Runtime/WebGLTemplates/YandexGames/ && cp dist/index.html ../Assets/Plugins/YandexGamesSDK/Runtime/WebGLTemplates/YandexGames/",
+    "copy:template:test": "cp dist/__sdk.js ../Assets/WebGLTemplates/YandexGames/ && cp dist/index.html ../Assets/WebGLTemplates/YandexGames/",
+    "copy:sdk": "cp dist/__sdk.jslib ../Assets/Plugins/YandexGamesSDK/Runtime/WebGL/",
+    "build:all": "npm run build:prod && npm run copy:template:prod && npm run copy:template:test && npm run  copy:sdk"
   },
   "keywords": [],
   "author": "",

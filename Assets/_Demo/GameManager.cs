@@ -25,12 +25,37 @@ public class GameManager : MonoBehaviour
                 Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
             }
         });
+        
+        YandexGamesSDK.Instance.GetServerTime((isFetched, time) =>
+        {
+            Debug.Log("GetServerTime: " + time);
+        });
+        
+        YandexGamesSDK.Instance.GetEnvironment((isFetched, env) =>
+        {
+            Debug.Log("GetEnvironment: " + env.i18n.lang);
+        });
+
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.S))
         {
+            YandexGamesSDK.Instance.Advertisement.ShowRewardedAd((a,v) =>{},
+                
+                onOpen: delegate
+                {
+                    Debug.Log("OnOpen");
+                },
+                onClose: delegate
+                {
+                    Debug.Log("OnClose");
+                },
+                onReward: delegate
+                {
+                    Debug.Log("OnReward");
+                });
             YandexGamesSDK.Instance.CloudStorage.SaveData("testData", new PlayerData()
             {
                 level = "1",
