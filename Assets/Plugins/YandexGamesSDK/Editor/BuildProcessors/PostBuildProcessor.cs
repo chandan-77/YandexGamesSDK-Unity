@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEditor.Build;
@@ -28,6 +29,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.BuildProcessors
             if (config.developmentSettings.overrideOnBuild)
             {
                 config.SetServerConfiguration(report.summary.outputPath, FindAvailablePort());
+            }
+
+            if (config.developmentSettings.runLocalServerAfterBuild)
+            {
+                if (!LocalServerManager.IsRunning)
+                {
+                    LocalServerManager.StartLocalServer(config);
+                }
             }
         }
 

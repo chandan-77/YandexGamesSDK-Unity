@@ -11,18 +11,20 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 {
     public class LocalServerManager
     {
-        private Process serverProcess;
-        private StringBuilder logBuilder = new StringBuilder();
-        public string Logs => logBuilder.ToString();
-        public bool IsRunning => serverProcess != null && !serverProcess.HasExited;
+        private static Process serverProcess;
+        private static StringBuilder logBuilder = new StringBuilder();
+        public static string Logs => logBuilder.ToString();
+        public static bool IsRunning => serverProcess != null && !serverProcess.HasExited;
 
         // Event to notify log updates
-        public event Action OnLogUpdate;
+        public static event Action OnLogUpdate;
 
-        /// <summary>
-        /// Starts the local server using npx and the specified build path and port.
-        /// </summary>
-        public async void StartLocalServer(string buildPath, string port)
+        public static void StartLocalServer(YandexGamesSDKConfig config)
+        {
+            StartLocalServer(config.developmentSettings.buildPath, config.developmentSettings.serverPort.ToString());
+        }
+
+        public static void StartLocalServer(string buildPath, string port)
         {
             var config = YandexGamesSDKConfig.Instance;
 
@@ -127,7 +129,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Finds the path to 'node' dynamically by checking the system PATH and common install locations.
         /// </summary>
-        private string FindNodePath()
+        private static string FindNodePath()
         {
             string nodeExecutableName = "node";
             if (Application.platform == RuntimePlatform.WindowsEditor)
@@ -186,7 +188,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Finds the path to 'npx' dynamically by checking the system PATH and common install locations.
         /// </summary>
-        private string FindNpxPath()
+        private static string FindNpxPath()
         {
             string npxExecutableName = "npx";
             if (Application.platform == RuntimePlatform.WindowsEditor)
@@ -245,7 +247,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Stops the local server if it's running.
         /// </summary>
-        public void StopServer()
+        public static void StopServer()
         {
             if (IsRunning)
             {
@@ -276,7 +278,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Clears the current logs.
         /// </summary>
-        public void ClearLogs()
+        public static void ClearLogs()
         {
             logBuilder.Clear();
             OnLogUpdate?.Invoke();
@@ -298,7 +300,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Cleans up the server process when the application quits.
         /// </summary>
-        public void Cleanup()
+        public static void Cleanup()
         {
             if (IsRunning)
             {

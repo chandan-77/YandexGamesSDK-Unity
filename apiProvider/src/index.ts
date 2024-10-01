@@ -30,6 +30,7 @@ window.YandexSDKExports = {
 };
 
 
+
 window.addEventListener('load', () => {
   YandexGamesSDK.initialize();
 });

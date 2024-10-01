@@ -7,7 +7,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
     public class YandexGamesSDKDashboard : EditorWindow
     {
         private YandexGamesSDKConfig config;
-        private LocalServerManager _localServerManager;
         private Vector2 logScrollPos;
         private string logText = "";
         private bool autoScroll = true;
@@ -21,8 +20,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private void OnEnable()
         {
             LoadConfig();
-            _localServerManager = new LocalServerManager();
-            _localServerManager.OnLogUpdate += UpdateLogs;
+       
+            LocalServerManager.OnLogUpdate += UpdateLogs;
 
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.quitting += OnQuitting;
@@ -30,8 +29,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
         private void OnDisable()
         {
-            _localServerManager.OnLogUpdate -= UpdateLogs;
-            _localServerManager.Cleanup();
+            LocalServerManager.OnLogUpdate -= UpdateLogs;
+            LocalServerManager.Cleanup();
 
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.quitting -= OnQuitting;
@@ -100,11 +99,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             EditorGUILayout.LabelField("Local Server Controls", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginHorizontal();
-            if (_localServerManager.IsRunning)
+            if (LocalServerManager.IsRunning)
             {
                 if (GUILayout.Button("Stop Server"))
                 {
-                    _localServerManager.StopServer();
+                    LocalServerManager.StopServer();
                 }
             }
             else
@@ -120,7 +119,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Server Status: ");
             GUIStyle statusStyle = new GUIStyle(EditorStyles.boldLabel);
-            if (_localServerManager.IsRunning)
+            if (LocalServerManager.IsRunning)
             {
                 statusStyle.normal.textColor = Color.green;
                 GUILayout.Label("Running", statusStyle);
@@ -142,7 +141,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             autoScroll = GUILayout.Toggle(autoScroll, "Auto-Scroll", GUILayout.Width(100));
             if (GUILayout.Button("Clear Logs"))
             {
-                _localServerManager.ClearLogs();
+                LocalServerManager.ClearLogs();
                 logText = "";
             }
             EditorGUILayout.EndHorizontal();
@@ -169,12 +168,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 return;
             }
 
-            _localServerManager.StartLocalServer(buildPath, port);
+            LocalServerManager.StartLocalServer(buildPath, port);
         }
 
         private void UpdateLogs()
         {
-            logText = _localServerManager.Logs;
+            logText = LocalServerManager.Logs;
         }
 
         private void LoadConfig()
@@ -203,13 +202,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         {
             if (state == PlayModeStateChange.ExitingEditMode)
             {
-                _localServerManager.StopServer();
+                Debug.Log("TODO: Play Mode is ExitingEditMode");
+                // LocalServerManager.StopServer();
             }
         }
 
         private void OnQuitting()
         {
-            _localServerManager.Cleanup();
+            LocalServerManager.Cleanup();
         }
     }
 }

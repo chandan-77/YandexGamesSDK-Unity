@@ -4,7 +4,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {
 
     [Serializable]
-    public record EnvironmentData
+    public class EnvironmentData
     {
         public AppData app { get; init; }
         public BrowserData browser { get; init; }
@@ -15,33 +15,33 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
     }
 
     [Serializable]
-    public record AppData
+    public class AppData
     {
         public string id { get; init; }
     }
 
     [Serializable]
-    public record BrowserData
+    public struct BrowserData
     {
         public string lang { get; init; }
     }
 
     [Serializable]
-    public record Data
+    public struct Data
     {
         public string baseUrl { get; init; }
         public string secondDomain { get; init; }
     }
 
     [Serializable]
-    public record I18n
+    public struct I18n
     {
         public string lang { get; init; }
         public string tld { get; init; }
     }
 
     [Serializable]
-    public class Root
+    public struct Root
     {
         public EnvironmentData env { get; set; }
     }

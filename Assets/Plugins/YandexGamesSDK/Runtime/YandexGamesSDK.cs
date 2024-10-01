@@ -43,7 +43,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         [DllImport("__Internal")]
         private static extern void GetEnvironment();
 
-        private Action<bool, TimeSpan> getServerTimeCallback;
+        private Action<bool, DateTime> getServerTimeCallback;
         private Action<bool, EnvironmentData> getEnvironmetCallback;
 
 
@@ -73,14 +73,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             InitializeModules();
         }
 
-        public void GetServerTime(Action<bool, TimeSpan> callback)
+        public void GetServerTime(Action<bool, DateTime> callback)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             getServerTimeCallback = callback;
             GetServerTime();
 #else
             Debug.Log("GetServerTime is only available in WebGL builds.");
-            callback(false, TimeSpan.Zero);
+            callback(false, DateTime.MinValue);
 #endif
         }
 
@@ -91,7 +91,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             GetEnvironment();
 #else
             Debug.Log("GetEnvironment is only available in WebGL builds.");
-            callback(false, null);
+            callback(false, default);
 #endif
         }
 
@@ -99,37 +99,42 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         {
             Debug.Log($"Server Time Retrieved: {serverTime}");
 
-            if (TimeSpan.TryParse(serverTime, out TimeSpan serverTimeParsed))
+            if (long.TryParse(serverTime, out long serverTimeMillis))
             {
-                getServerTimeCallback?.Invoke(true, serverTimeParsed);
-                return;
-            }
+                // Convert milliseconds since Unix epoch to a DateTime
+                DateTime serverDateTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeMillis).UtcDateTime;
+                Debug.Log($"Parsed Server Time: {serverDateTime}");
 
-            Debug.Log($"Failed to parse server time: {serverTime}");
+                getServerTimeCallback?.Invoke(true, serverDateTime);
+            }
+            else
+            {
+                Debug.LogError($"Failed to parse server time: {serverTime}");
+                getServerTimeCallback?.Invoke(false, DateTime.MinValue);
+            }
         }
 
         public void OnGetServerTimeFailure(string error)
         {
             Debug.LogError($"Failed to get server time: {error}");
-
-            getServerTimeCallback?.Invoke(false, TimeSpan.Zero);
+            getServerTimeCallback?.Invoke(false, DateTime.MinValue);
         }
 
         public void OnGetEnvironmentSuccess(string environment)
         {
             Debug.Log($"Environment Retrieved: {environment}");
 
-            var data = JsonUtility.FromJson<Root>(environment);
+            var data = JsonUtility.FromJson<EnvironmentData>(environment);
 
-            Debug.Log($"Environment Retrieved: {JsonUtility.ToJson(data.env)}");
-            getEnvironmetCallback?.Invoke(true, data.env);
+            Debug.Log($"Environment Retrieved: {JsonUtility.ToJson(data)}");
+            getEnvironmetCallback?.Invoke(true, data);
         }
 
         public void OnGetEnvironmentFailure(string error)
         {
             Debug.LogError($"Failed to get environment: {error}");
 
-            getEnvironmetCallback?.Invoke(false, null);
+            getEnvironmetCallback?.Invoke(false, default);
         }
 
         public void OnSDKInitialized(string message)
