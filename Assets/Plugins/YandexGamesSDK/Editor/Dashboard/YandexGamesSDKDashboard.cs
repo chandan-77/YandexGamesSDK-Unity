@@ -1,8 +1,8 @@
-using Plugins.YandexGamesSDK.Runtime.Dashboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Editor.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 {
     public class YandexGamesSDKDashboard : EditorWindow
     {
@@ -66,7 +66,6 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
             // General Settings
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"), new GUIContent("App ID"));
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("isYandexPlatform"), new GUIContent("Is Yandex Platform"));
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"), new GUIContent("Verbose Logging"));
 
             EditorGUILayout.Space();

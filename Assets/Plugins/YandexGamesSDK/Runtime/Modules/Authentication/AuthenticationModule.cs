@@ -1,10 +1,11 @@
 using System;
-using System.Net;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
+using IAuthenticationModule = PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication.IAuthenticationModule;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public class AuthenticationModule : YGModuleBase, IAuthenticationModule
     {

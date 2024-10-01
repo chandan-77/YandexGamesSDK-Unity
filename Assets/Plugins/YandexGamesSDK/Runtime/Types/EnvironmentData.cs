@@ -1,6 +1,6 @@
 using System;
 
-namespace Plugins.YandexGamesSDK.Runtime.Types
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {
 
     [Serializable]

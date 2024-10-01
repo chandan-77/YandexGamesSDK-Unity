@@ -4,10 +4,10 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Plugins.YandexGamesSDK.Runtime.Dashboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Editor.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 {
     public class LocalServerManager
     {

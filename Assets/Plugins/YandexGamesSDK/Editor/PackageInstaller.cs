@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Editor
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
 {
     [InitializeOnLoad]
     public static class PackageInstaller

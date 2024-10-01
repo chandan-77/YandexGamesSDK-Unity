@@ -1,10 +1,11 @@
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
 {
     public class LeaderboardModule : YGModuleBase, ILeaderboardModule
     {

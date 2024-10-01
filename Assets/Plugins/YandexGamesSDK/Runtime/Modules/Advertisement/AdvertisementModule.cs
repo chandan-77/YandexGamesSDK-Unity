@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
 {
     public class AdvertisementModule : YGModuleBase, IAdvertisementModule
     {

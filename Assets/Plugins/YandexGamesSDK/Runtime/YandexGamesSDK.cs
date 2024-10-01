@@ -1,14 +1,14 @@
 using System;
 using System.Runtime.InteropServices;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
-using Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
-using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
-using Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
-using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
-using Plugins.YandexGamesSDK.Runtime.Types;
 
-namespace Plugins.YandexGamesSDK.Runtime
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 {
     [DefaultExecutionOrder(-100)]
     public class YandexGamesSDK : MonoBehaviour

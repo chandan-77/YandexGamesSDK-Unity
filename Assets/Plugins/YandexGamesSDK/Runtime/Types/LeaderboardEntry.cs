@@ -1,6 +1,6 @@
 using System;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {
     [Serializable]
     public record LeaderboardEntry

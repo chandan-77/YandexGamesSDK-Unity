@@ -1,6 +1,7 @@
 using System;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public interface IAuthenticationModule
     {

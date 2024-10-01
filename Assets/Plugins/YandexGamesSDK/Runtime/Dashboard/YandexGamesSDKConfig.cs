@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Plugins.YandexGamesSDK.Runtime.Singletons;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Singletons;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Plugins.YandexGamesSDK.Runtime.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
 {
     [Serializable]
     public record DevelopmentSettings

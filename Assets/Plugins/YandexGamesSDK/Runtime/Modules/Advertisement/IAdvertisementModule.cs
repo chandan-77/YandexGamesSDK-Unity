@@ -1,6 +1,6 @@
 using System;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
 {
     public interface IAdvertisementModule
     {

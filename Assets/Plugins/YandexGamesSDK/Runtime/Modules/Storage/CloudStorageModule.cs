@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Storage
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
 {
     public class CloudStorageModule : YGModuleBase, ICloudStorageModule
     {

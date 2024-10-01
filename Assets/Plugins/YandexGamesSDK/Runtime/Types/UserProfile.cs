@@ -1,6 +1,6 @@
 using System;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {
     [Serializable]
     public class UserProfile

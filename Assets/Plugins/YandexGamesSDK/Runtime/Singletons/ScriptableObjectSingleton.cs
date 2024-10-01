@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Runtime.Singletons
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Singletons
 {
     /// <summary>
     /// Scriptable object singleton, mostly used for settings where only ONE instance should be present in game.

@@ -1,17 +1,13 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Plugins.YandexGamesSDK.Runtime.Dashboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Editor.BuildProcessors
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.BuildProcessors
 {
     public class PostBuildProcessor : IPostprocessBuildWithReport
     {

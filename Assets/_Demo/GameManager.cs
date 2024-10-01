@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
