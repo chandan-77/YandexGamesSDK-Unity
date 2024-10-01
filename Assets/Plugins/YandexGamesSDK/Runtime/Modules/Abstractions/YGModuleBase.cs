@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Abstractions
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions
 {
     public abstract class YGModuleBase : MonoBehaviour
     {

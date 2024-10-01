@@ -1,10 +1,11 @@
 using System;
-using System.Net;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
+using IAuthenticationModule = PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication.IAuthenticationModule;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public class AuthenticationModule : YGModuleBase, IAuthenticationModule
     {
@@ -12,17 +13,17 @@ namespace Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         private Action<bool, string> authenticationCallback;
 
         [DllImport("__Internal")]
-        private static extern void AuthenticateUser();
+        private static extern void AuthenticateUser(bool requireSignin);
 
         public override void Initialize()
         {
         }
 
-        public void AuthenticateUser(Action<bool, string> callback)
+        public void AuthenticateUser(Action<bool, string> callback, bool requireSignin = false)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
         authenticationCallback = callback;
-        AuthenticateUser();
+        AuthenticateUser(requireSignin);
 #else
             Debug.Log("Authentication is only available in WebGL builds.");
             callback(false, "Authentication is only available in WebGL builds.");

@@ -1,6 +1,6 @@
 using System;
 
-namespace Plugins.YandexGamesSDK.Runtime.Modules.Storage
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
 {
     public interface ICloudStorageModule
     {

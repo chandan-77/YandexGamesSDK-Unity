@@ -31,6 +31,8 @@ declare module "YandexGamesSDK" {
                 get payload(): string | null;
             };
 
+            serverTime(): Date;
+
             deviceInfo: {
                 get type(): string;
                 isMobile(): boolean;
@@ -43,6 +45,10 @@ declare module "YandexGamesSDK" {
                 LoadingAPI: {
                     ready(): void;
                 };
+                GameplayAPI: {
+                    start(): void;
+                    stop(): void;
+                }
             };
 
             clipboard: {

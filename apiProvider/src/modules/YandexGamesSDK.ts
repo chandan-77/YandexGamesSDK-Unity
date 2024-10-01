@@ -1,3 +1,4 @@
+import { YandexGames } from "YandexGamesSDK";
 import { Utils } from "../system/utils";
 
 export class YandexGamesSDK {
@@ -18,18 +19,8 @@ export class YandexGamesSDK {
      */
     public static async initialize(): Promise<void> {
         try {
-            if (Utils.isLocalhost()) {
-                await YandexGamesSDK.initializeUnity();
-                await YandexGamesSDK.waitForYandexGamesSDKReady();
-
-                YandexGamesSDK.isInitialized = true;
-                window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', 'true');
-
-                console.log("Unity initialized successfully on localhost.");
-            } else {
-                // Load Yandex SDK and then initialize Unity
-                await YandexGamesSDK.loadYandexSDK();
-            }
+            // Load Yandex SDK and then initialize Unity
+            await YandexGamesSDK.loadYandexSDK();
         } catch (error: any) {
             console.error("Failed to initialize:", error.message);
 
@@ -40,6 +31,37 @@ export class YandexGamesSDK {
             window.unityInstance.SendMessage('YandexGamesSDK', 'OnSDKInitialized', `false|${error.message}`);
         }
     }
+
+    public static async getServerTime(): Promise<void> {
+        try {
+            const sdk: YandexGames.SDK = window.yandexSDK;
+            let serverTime = await sdk.serverTime();
+
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetServerTimeSuccess', String(serverTime));
+    
+        } catch (error: any) {
+            console.error('Failed to get server time:', error.message || String(error));
+
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetServerTimeFailure', `false|${error.message || String(error)}`);
+        }
+    }
+    
+    public static async getEnvironment(): Promise<void> {
+        try {
+            const sdk: YandexGames.SDK = window.yandexSDK;
+            let env = sdk.environment;  // Assuming environment is a property
+    
+            // Send success message to Unity
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetEnvironmentSuccess', JSON.stringify(env)
+        );
+    
+        } catch (error: any) {
+            console.error('Failed to get environment:', error.message || String(error));
+
+            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetEnvironmetFailure', `false|${error.message || String(error)}`);
+        }
+    }
+    
 
     /**
      * Loads the Yandex SDK script and initializes it.

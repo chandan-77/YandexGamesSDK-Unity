@@ -1,13 +1,12 @@
-using Plugins.YandexGamesSDK.Runtime.Dashboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 
-namespace Plugins.YandexGamesSDK.Editor.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 {
     [CustomEditor(typeof(YandexGamesSDKConfig))]
     public class YandexGamesSDKConfigEditor : UnityEditor.Editor
     {
         private SerializedProperty appIDProp;
-        private SerializedProperty isYandexPlatformProp;
         private SerializedProperty verboseLoggingProp;
         private SerializedProperty useMockDataProp;
         private SerializedProperty mockDataProp;
@@ -16,7 +15,6 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
         private void OnEnable()
         {
             appIDProp = serializedObject.FindProperty("appID");
-            isYandexPlatformProp = serializedObject.FindProperty("isYandexPlatform");
             verboseLoggingProp = serializedObject.FindProperty("verboseLogging");
             useMockDataProp = serializedObject.FindProperty("useMockData");
             mockDataProp = serializedObject.FindProperty("mockData");
@@ -29,7 +27,6 @@ namespace Plugins.YandexGamesSDK.Editor.Dashboard
 
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(appIDProp);
-            EditorGUILayout.PropertyField(isYandexPlatformProp);
             EditorGUILayout.PropertyField(verboseLoggingProp);
 
             EditorGUILayout.Space();

@@ -1,11 +1,14 @@
+using System;
 using System.Runtime.InteropServices;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
-using Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
-using Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
-using Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
-using Plugins.YandexGamesSDK.Runtime.Modules.Storage;
 
-namespace Plugins.YandexGamesSDK.Runtime
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 {
     [DefaultExecutionOrder(-100)]
     public class YandexGamesSDK : MonoBehaviour
@@ -34,9 +37,20 @@ namespace Plugins.YandexGamesSDK.Runtime
         [DllImport("__Internal")]
         private static extern void OnYandexGamesSDKReady();
 
+        [DllImport("__Internal")]
+        private static extern void GetServerTime();
+
+        [DllImport("__Internal")]
+        private static extern void GetEnvironment();
+
+        private Action<bool, DateTime> getServerTimeCallback;
+        private Action<bool, EnvironmentData> getEnvironmetCallback;
+
+
         public IAuthenticationModule Authentication { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
         public ILeaderboardModule Leaderboard { get; private set; }
+        public IAdvertisementModule Advertisement { get; private set; }
 
         private bool _isInitialized = false;
 
@@ -52,11 +66,75 @@ namespace Plugins.YandexGamesSDK.Runtime
                 Destroy(gameObject);
             }
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && !UNITY_EDITOR
         OnYandexGamesSDKReady();
 #endif
 
             InitializeModules();
+        }
+
+        public void GetServerTime(Action<bool, DateTime> callback)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            getServerTimeCallback = callback;
+            GetServerTime();
+#else
+            Debug.Log("GetServerTime is only available in WebGL builds.");
+            callback(false, DateTime.MinValue);
+#endif
+        }
+
+        public void GetEnvironment(Action<bool, EnvironmentData> callback)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            getEnvironmetCallback = callback;
+            GetEnvironment();
+#else
+            Debug.Log("GetEnvironment is only available in WebGL builds.");
+            callback(false, default);
+#endif
+        }
+
+        public void OnGetServerTimeSuccess(string serverTime)
+        {
+            Debug.Log($"Server Time Retrieved: {serverTime}");
+
+            if (long.TryParse(serverTime, out long serverTimeMillis))
+            {
+                // Convert milliseconds since Unix epoch to a DateTime
+                DateTime serverDateTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeMillis).UtcDateTime;
+                Debug.Log($"Parsed Server Time: {serverDateTime}");
+
+                getServerTimeCallback?.Invoke(true, serverDateTime);
+            }
+            else
+            {
+                Debug.LogError($"Failed to parse server time: {serverTime}");
+                getServerTimeCallback?.Invoke(false, DateTime.MinValue);
+            }
+        }
+
+        public void OnGetServerTimeFailure(string error)
+        {
+            Debug.LogError($"Failed to get server time: {error}");
+            getServerTimeCallback?.Invoke(false, DateTime.MinValue);
+        }
+
+        public void OnGetEnvironmentSuccess(string environment)
+        {
+            Debug.Log($"Environment Retrieved: {environment}");
+
+            var data = JsonUtility.FromJson<EnvironmentData>(environment);
+
+            Debug.Log($"Environment Retrieved: {JsonUtility.ToJson(data)}");
+            getEnvironmetCallback?.Invoke(true, data);
+        }
+
+        public void OnGetEnvironmentFailure(string error)
+        {
+            Debug.LogError($"Failed to get environment: {error}");
+
+            getEnvironmetCallback?.Invoke(false, default);
         }
 
         public void OnSDKInitialized(string message)
@@ -77,7 +155,7 @@ namespace Plugins.YandexGamesSDK.Runtime
         private void InitializeModules()
         {
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
-            // Advertisement = LoadAndInitializeModule<AdvertisementModule>();
+            Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
         }

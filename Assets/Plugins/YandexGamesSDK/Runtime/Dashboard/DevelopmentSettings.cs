@@ -1,5 +1,3 @@
-using System;
-
-namespace Plugins.YandexGamesSDK.Runtime.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
 {
 }

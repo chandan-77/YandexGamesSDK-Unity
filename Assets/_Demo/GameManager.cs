@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Plugins.YandexGamesSDK.Runtime;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -24,13 +24,38 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
             }
+        }, true);
+        
+        YandexGamesSDK.Instance.GetServerTime((isFetched, time) =>
+        {
+            Debug.Log("GetServerTime: " + time);
         });
+        
+        YandexGamesSDK.Instance.GetEnvironment((isFetched, env) =>
+        {
+            Debug.Log("GetEnvironment: " + env.i18n.lang);
+        });
+
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.S))
         {
+            YandexGamesSDK.Instance.Advertisement.ShowRewardedAd((a,v) =>{},
+                
+                onOpen: delegate
+                {
+                    Debug.Log("OnOpen");
+                },
+                onClose: delegate
+                {
+                    Debug.Log("OnClose");
+                },
+                onReward: delegate
+                {
+                    Debug.Log("OnReward");
+                });
             YandexGamesSDK.Instance.CloudStorage.SaveData("testData", new PlayerData()
             {
                 level = "1",
