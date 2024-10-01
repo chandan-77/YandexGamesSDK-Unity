@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
             }
-        });
+        }, true);
         
         YandexGamesSDK.Instance.GetServerTime((isFetched, time) =>
         {

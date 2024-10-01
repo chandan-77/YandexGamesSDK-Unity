@@ -42,7 +42,7 @@ class GenerateJSLibPlugin {
         }
       }
 
-      // Check if this is an assignment to `window.YandexSDKExports`
+      // Check if this is an assignment to window.YandexSDKExports
       if (
         ts.isExpressionStatement(node) &&
         ts.isBinaryExpression(node.expression) &&
@@ -67,11 +67,12 @@ class GenerateJSLibPlugin {
                 console.log(`Found YandexSDKExports method: ${methodName}`);
 
                 if (ts.isFunctionExpression(property.initializer) || ts.isArrowFunction(property.initializer)) {
-                  const parameters = property.initializer.parameters.map((param) =>
-                    param.name.getText()
-                  );
+                  const parameters = property.initializer.parameters.map((param) => ({
+                    name: param.name.getText(),
+                    type: param.type ? param.type.getText() : 'any',
+                  }));
                   methods.push({ name: methodName, parameters });
-                  console.log(`Extracted inline method: ${methodName} with parameters: ${parameters}`);
+                  console.log(`Extracted inline method: ${methodName} with parameters: ${JSON.stringify(parameters)}`);
                 } else if (ts.isIdentifier(property.initializer)) {
                   // Handle imported functions
                   const importedModuleName = imports.get(property.initializer.getText());
@@ -81,7 +82,7 @@ class GenerateJSLibPlugin {
                       console.log(`Attempting to extract parameters for imported method: ${methodName} from ${importedFilePath}`);
                       const importedParameters = this.getFunctionParameters(importedFilePath, property.initializer.getText());
                       methods.push({ name: methodName, parameters: importedParameters });
-                      console.log(`Extracted imported method: ${methodName} with parameters: ${importedParameters}`);
+                      console.log(`Extracted imported method: ${methodName} with parameters: ${JSON.stringify(importedParameters)}`);
                     } else {
                       console.warn(`Could not resolve path for import: ${importedModuleName}`);
                     }
@@ -100,7 +101,7 @@ class GenerateJSLibPlugin {
                       console.log(`Attempting to extract parameters for method: ${functionName} from ${importedFilePath}`);
                       const parameters = this.getClassMethodParameters(importedFilePath, objectName, functionName);
                       methods.push({ name: methodName, parameters });
-                      console.log(`Extracted method: ${methodName} with parameters: ${parameters}`);
+                      console.log(`Extracted method: ${methodName} with parameters: ${JSON.stringify(parameters)}`);
                     } else {
                       console.warn(`Could not resolve path for import: ${importedModuleName}`);
                     }
@@ -151,16 +152,23 @@ class GenerateJSLibPlugin {
 
     const findFunction = (node) => {
       if (ts.isFunctionDeclaration(node) && node.name && node.name.getText() === functionName) {
-        parameters = node.parameters.map((param) => param.name.getText());
-        console.log(`Found function declaration for ${functionName} with parameters: ${parameters}`);
+        parameters = node.parameters.map((param) => ({
+          name: param.name.getText(),
+          type: param.type ? param.type.getText() : 'any',
+        }));
+        console.log(`Found function declaration for ${functionName} with parameters: ${JSON.stringify(parameters)}`);
       } else if (ts.isVariableStatement(node)) {
         node.declarationList.declarations.forEach((declaration) => {
           if (ts.isVariableDeclaration(declaration) && declaration.name.getText() === functionName) {
-            if (declaration.initializer &&
+            if (
+              declaration.initializer &&
               (ts.isFunctionExpression(declaration.initializer) || ts.isArrowFunction(declaration.initializer))
             ) {
-              parameters = declaration.initializer.parameters.map((param) => param.name.getText());
-              console.log(`Found variable function ${functionName} with parameters: ${parameters}`);
+              parameters = declaration.initializer.parameters.map((param) => ({
+                name: param.name.getText(),
+                type: param.type ? param.type.getText() : 'any',
+              }));
+              console.log(`Found variable function ${functionName} with parameters: ${JSON.stringify(parameters)}`);
             }
           }
         });
@@ -168,8 +176,11 @@ class GenerateJSLibPlugin {
         if (node.members) {
           node.members.forEach((member) => {
             if (ts.isMethodDeclaration(member) && member.name && member.name.getText() === functionName) {
-              parameters = member.parameters.map((param) => param.name.getText());
-              console.log(`Found class method ${functionName} with parameters: ${parameters}`);
+              parameters = member.parameters.map((param) => ({
+                name: param.name.getText(),
+                type: param.type ? param.type.getText() : 'any',
+              }));
+              console.log(`Found class method ${functionName} with parameters: ${JSON.stringify(parameters)}`);
             }
           });
         }
@@ -200,8 +211,11 @@ class GenerateJSLibPlugin {
       if (ts.isClassDeclaration(node) && node.name && node.name.getText() === className) {
         node.members.forEach((member) => {
           if (ts.isMethodDeclaration(member) && member.name.getText() === methodName) {
-            parameters = member.parameters.map((param) => param.name.getText());
-            console.log(`Found method ${methodName} in class ${className} with parameters: ${parameters}`);
+            parameters = member.parameters.map((param) => ({
+              name: param.name.getText(),
+              type: param.type ? param.type.getText() : 'any',
+            }));
+            console.log(`Found method ${methodName} in class ${className} with parameters: ${JSON.stringify(parameters)}`);
           }
         });
       }
@@ -216,18 +230,33 @@ class GenerateJSLibPlugin {
     let jslibContent = 'mergeInto(LibraryManager.library, {\n';
 
     methods.forEach(({ name, parameters }) => {
-        const paramList = parameters.length > 0 ? parameters.map((param) => `${param}Ptr`).join(', ') : '';
-        const args = parameters.length > 0 ? parameters.map((param) => `UTF8ToString(${param}Ptr)`).join(', ') : '';
+      const paramList = parameters.length > 0 ? parameters.map((param) => `${param.name}Ptr`).join(', ') : '';
 
-        jslibContent += `
-        ${name}: function(${paramList}) {
-          if (typeof window.YandexSDKExports.${name} === 'function') {
-            ${parameters.length > 0 ? `var ${parameters.map((param) => `${param} = UTF8ToString(${param}Ptr)`).join(', ')};` : ''}
-            window.YandexSDKExports.${name}(${parameters.join(', ')});
-          } else {
-            console.error('${name} is not defined on window.YandexSDKExports.');
-          }
-        },\n`;
+      const paramConversions = parameters.map((param) => {
+        let conversionCode = '';
+        const ptrName = `${param.name}Ptr`;
+        if (param.type === 'string') {
+          conversionCode = `var ${param.name} = UTF8ToString(${ptrName});`;
+        // } else if (param.type === 'boolean') {
+        //   conversionCode = `var ${param.name} = !!HEAP32[${ptrName} >> 2];`;
+        // } else if (param.type === 'number' || param.type === 'int') {
+        //   conversionCode = `var ${param.name} = HEAP32[${ptrName} >> 2];`;
+        } else {
+          // Default to string if type is unknown
+          conversionCode = `var ${param.name} = ${ptrName};`;
+        }
+        return conversionCode;
+      }).join('\n');
+
+      jslibContent += `
+  ${name}: function(${paramList}) {
+    if (typeof window.YandexSDKExports.${name} === 'function') {
+      ${paramConversions}
+      window.YandexSDKExports.${name}(${parameters.map(param => param.name).join(', ')});
+    } else {
+      console.error('${name} is not defined on window.YandexSDKExports.');
+    }
+  },\n`;
     });
 
     jslibContent += '});';
@@ -235,8 +264,7 @@ class GenerateJSLibPlugin {
     // Write the generated content to __sdk.jslib
     fs.writeFileSync(this.outputFilePath, jslibContent);
     console.log('__sdk.jslib has been generated successfully.');
-}
-
+  }
 }
 
 module.exports = GenerateJSLibPlugin;

@@ -19,10 +19,15 @@ interface Window {
   unityInstance: UnityInstance;
 }
 
+
+
 declare function SendMessage(gameObject: string, methodName: string, parameter?: any): void;
 declare function UTF8ToString(ptr: number): string;
 
 declare var mergeInto: (target: any, source: any) => void;
+
+declare var player: YandexGames.Player;
+declare var isPlayerInitialized: boolean;
 
 declare var LibraryManager: {
   library: any;

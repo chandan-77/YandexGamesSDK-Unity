@@ -13,17 +13,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
         private Action<bool, string> authenticationCallback;
 
         [DllImport("__Internal")]
-        private static extern void AuthenticateUser();
+        private static extern void AuthenticateUser(bool requireSignin);
 
         public override void Initialize()
         {
         }
 
-        public void AuthenticateUser(Action<bool, string> callback)
+        public void AuthenticateUser(Action<bool, string> callback, bool requireSignin = false)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
         authenticationCallback = callback;
-        AuthenticateUser();
+        AuthenticateUser(requireSignin);
 #else
             Debug.Log("Authentication is only available in WebGL builds.");
             callback(false, "Authentication is only available in WebGL builds.");
