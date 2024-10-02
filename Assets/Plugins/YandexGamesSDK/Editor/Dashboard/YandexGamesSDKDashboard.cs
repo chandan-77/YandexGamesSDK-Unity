@@ -1,3 +1,4 @@
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.Servers;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEngine;
@@ -29,8 +30,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
         private void OnDisable()
         {
-            LocalServerManager.OnLogUpdate -= UpdateLogs;
-            LocalServerManager.Cleanup();
+            LibLocalServerManager.OnLogUpdate -= UpdateLogs;
+            LibLocalServerManager.Cleanup();
 
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.quitting -= OnQuitting;
@@ -103,7 +104,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             {
                 if (GUILayout.Button("Stop Server"))
                 {
-                    LocalServerManager.StopServer();
+                    LibLocalServerManager.StopLocalServer();
                 }
             }
             else
@@ -160,7 +161,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private void StartServer()
         {
             string buildPath = config.developmentSettings.buildPath;
-            string port = config.developmentSettings.serverPort.ToString();
+            int port = config.developmentSettings.serverPort;
 
             if (string.IsNullOrEmpty(buildPath))
             {
@@ -168,12 +169,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 return;
             }
 
-            LocalServerManager.StartLocalServer(buildPath, port);
+            LibLocalServerManager.StartLocalServer(buildPath, port);
         }
 
         private void UpdateLogs()
         {
-            logText = LocalServerManager.Logs;
+            logText = LibLocalServerManager.Logs;
         }
 
         private void LoadConfig()
@@ -209,7 +210,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
         private void OnQuitting()
         {
-            LocalServerManager.Cleanup();
+            LibLocalServerManager.Cleanup();
         }
     }
 }

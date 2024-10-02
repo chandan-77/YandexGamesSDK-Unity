@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
+using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Servers
 {
@@ -15,11 +16,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Servers
         public static event Action OnLogUpdate;
 
         // Import the Go functions
-        [DllImport("proxy", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int StartServer(string host, string path, string appID, int port, string tld, int csp, int logReq);
+        [DllImport("libdev_proxy", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int StartServer(string host, string path, string appID, int port, string tld, int csp,
+            int logReq);
 
-        [DllImport("proxy", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libdev_proxy", CallingConvention = CallingConvention.Cdecl)]
         private static extern int StopServer();
+
 
         /// <summary>
         /// Start the local server using the Go shared library
@@ -44,8 +47,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Servers
             string path = buildPath;
             string appID = config.appID;
             string tld = "ru"; // Yandex default TLD, can be made configurable
-            int cspFlag = config.developmentSettings.includeCSP ? 1 : 0;
-            int logReqFlag = config.developmentSettings.enableLogging ? 1 : 0;
+            int cspFlag = 1; //config.developmentSettings.includeCSP ? 1 : 0;
+            int logReqFlag = 0; // config.developmentSettings.enableLogging ? 1 : 0;
 
             // Start the server
             try
@@ -61,9 +64,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Servers
                     UnityEngine.Debug.LogError($"Failed to start the server. Error code: {result}");
                 }
             }
+            catch (DllNotFoundException dllEx)
+            {
+                Debug.LogError($"DLL not found: {dllEx.Message}");
+            }
+            catch (EntryPointNotFoundException entryEx)
+            {
+                Debug.LogError($"Function not found in DLL: {entryEx.Message}");
+            }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError("Failed to start local server: " + ex.Message);
+                Debug.LogError($"Failed to start local server: {ex.Message}");
             }
         }
 
