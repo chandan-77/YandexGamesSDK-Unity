@@ -26,7 +26,7 @@ MonoBehaviour:
       avatarUrlLarge: 
     mockLeaderboardEntries: []
   developmentSettings:
-    runLocalServerAfterBuild: 1
+    runLocalServerAfterBuild: 0
     overrideOnBuild: 0
     buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
-    serverPort: 57664
+    serverPort: 53534
