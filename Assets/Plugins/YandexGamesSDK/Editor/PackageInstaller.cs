@@ -13,9 +13,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
             CopyConfigAsset();
         }
 
-        /// <summary>
-        /// Copies the WebGL template from the package to the project's Assets folder.
-        /// </summary>
         static void CopyWebGLTemplate()
         {
             string sourceRelativePath = Path.Combine("Runtime", "WebGLTemplates", "YandexGames");
@@ -39,13 +36,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
 
             if (!Directory.Exists(destinationPath))
             {
-                // Create the destination directory
                 Directory.CreateDirectory(destinationPath);
 
-                // Copy the template files
                 CopyDirectory(sourcePath, destinationPath);
 
-                // Refresh the AssetDatabase to recognize new files
                 AssetDatabase.Refresh();
 
                 Debug.Log("[YandexGamesSDK] WebGL Template successfully copied to Assets/WebGLTemplates/YandexGames");
@@ -56,9 +50,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
             }
         }
 
-        /// <summary>
-        /// Copies the YandexGamesSDKConfig.asset from the package to the project's Assets folder.
-        /// </summary>
         static void CopyConfigAsset()
         {
             string sourceRelativePath = Path.Combine("Runtime", "Resources", "YandexGamesSDKConfig.asset");
@@ -94,38 +85,25 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
             }
             else
             {
-                // Perform validation or prompt the user
                 Debug.Log("[YandexGamesSDK] Config asset already exists at Assets/YandexGamesSDK/Resources/");
-                // Optional: Implement version checking or prompting for overwrite
             }
         }
 
-        /// <summary>
-        /// Determines the package path based on the location of this script.
-        /// </summary>
-        /// <returns>The package path if found, or null otherwise.</returns>
         static string GetPackagePath()
         {
-            // Get the path of this script
             string scriptFilePath = GetScriptFilePath();
             if (string.IsNullOrEmpty(scriptFilePath))
             {
                 return null;
             }
 
-            // Get the directory of the script
             string scriptDir = Path.GetDirectoryName(scriptFilePath);
 
-            // The script is in /Runtime/, so go up to package root
             string packagePath = Path.GetFullPath(Path.Combine(scriptDir, ".."));
 
             return packagePath;
         }
 
-        /// <summary>
-        /// Finds the file path of this script using the AssetDatabase.
-        /// </summary>
-        /// <returns>The file path if found, or null otherwise.</returns>
         static string GetScriptFilePath()
         {
             string[] guids = AssetDatabase.FindAssets("PackageInstaller t:Script");
@@ -138,11 +116,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor
             return Path.GetFullPath(path);
         }
 
-        /// <summary>
-        /// Recursively copies a directory and its contents.
-        /// </summary>
-        /// <param name="sourceDir">The source directory.</param>
-        /// <param name="destinationDir">The destination directory.</param>
         static void CopyDirectory(string sourceDir, string destinationDir)
         {
             DirectoryInfo dir = new DirectoryInfo(sourceDir);

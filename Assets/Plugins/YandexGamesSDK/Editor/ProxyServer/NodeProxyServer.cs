@@ -7,28 +7,26 @@ using System.Text;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEngine;
 
-namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
+namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 {
-    public class LocalServerManager
+    public class NodeProxyServer
     {
-        private static Process serverProcess;
-        private static StringBuilder logBuilder = new StringBuilder();
-        public static string Logs => logBuilder.ToString();
-        public static bool IsRunning => serverProcess != null && !serverProcess.HasExited;
+        private Process serverProcess;
+        private StringBuilder logBuilder = new StringBuilder();
+        public string Logs => logBuilder.ToString();
+        public event Action<string> OnError;
+        public bool IsRunning => serverProcess != null && !serverProcess.HasExited;
 
-        // Event to notify log updates
-        public static event Action OnLogUpdate;
+        public event Action OnLogUpdate;
 
-        public static void StartLocalServer(YandexGamesSDKConfig config)
+        private YandexGamesSDKConfig _config;
+        public NodeProxyServer(YandexGamesSDKConfig config)
         {
-            StartLocalServer(config.developmentSettings.buildPath, config.developmentSettings.serverPort.ToString());
+            _config = config;
         }
 
-        public static void StartLocalServer(string buildPath, string port)
+        public void StartServer()
         {
-            var config = YandexGamesSDKConfig.Instance;
-
-            // Terminate the previous server process if it's still running
             if (serverProcess != null && !serverProcess.HasExited)
             {
                 serverProcess.Kill();
@@ -41,8 +39,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             string nodeExecutable = FindNodePath();
             if (string.IsNullOrEmpty(nodeExecutable))
             {
-                UnityEngine.Debug.LogError(
-                    "Unable to find 'node'. Please ensure that Node.js is installed and available in your system PATH.");
+                var err = "Unable to find 'node'. Please ensure that Node.js is installed and available in your system PATH.";
+             
+                UnityEngine.Debug.LogError(err);
+                logBuilder.AppendLine(err);
+
+                OnLogUpdate?.Invoke();
+                
                 return;
             }
 
@@ -50,13 +53,18 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
             if (string.IsNullOrEmpty(npxPath))
             {
-                UnityEngine.Debug.LogError(
-                    "Unable to find 'npx'. Please ensure that Node.js and npm are installed and 'npx' is available in your system PATH.");
+                var err =  "Unable to find 'npx'. Please ensure that Node.js and npm are installed and 'npx' is available in your system PATH.";
+
+                UnityEngine.Debug.LogError(err);
+                logBuilder.AppendLine(err);
+
+                OnLogUpdate?.Invoke();
+                
                 return;
             }
 
             string arguments =
-                $"@yandex-games/sdk-dev-proxy -p \"{buildPath}\" --app-id={config.appID} --port={port} -l";
+                $"@yandex-games/sdk-dev-proxy -p \"{_config.developmentSettings.buildPath}\" --app-id={_config.appID} --port={_config.developmentSettings.serverPort} -l";
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
@@ -66,10 +74,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
-                WorkingDirectory = buildPath,
+                WorkingDirectory = _config.developmentSettings.buildPath,
             };
 
-            // Log the PATH for debugging purposes
             UnityEngine.Debug.Log("Process PATH: " + startInfo.EnvironmentVariables["PATH"]);
 
             try
@@ -77,7 +84,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 serverProcess = new Process();
                 serverProcess.StartInfo = startInfo;
 
-                // Handle standard output
                 serverProcess.OutputDataReceived += (sender, args) =>
                 {
                     if (!string.IsNullOrEmpty(args.Data))
@@ -126,18 +132,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             }
         }
 
-        /// <summary>
-        /// Finds the path to 'node' dynamically by checking the system PATH and common install locations.
-        /// </summary>
-        private static string FindNodePath()
+        private string FindNodePath()
         {
             string nodeExecutableName = "node";
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
-                nodeExecutableName = "node.exe"; // On Windows, 'node' is 'node.exe'
+                nodeExecutableName = "node.exe"; 
             }
 
-            // First, try to find 'node' in the system PATH
             string pathEnv = Environment.GetEnvironmentVariable("PATH");
             string[] paths = pathEnv.Split(Path.PathSeparator);
 
@@ -151,7 +153,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 }
             }
 
-            // If not found, check common installation directories
             string[] commonPaths;
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
@@ -188,7 +189,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Finds the path to 'npx' dynamically by checking the system PATH and common install locations.
         /// </summary>
-        private static string FindNpxPath()
+        private string FindNpxPath()
         {
             string npxExecutableName = "npx";
             if (Application.platform == RuntimePlatform.WindowsEditor)
@@ -247,7 +248,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Stops the local server if it's running.
         /// </summary>
-        public static void StopServer()
+        public void StopServer()
         {
             if (IsRunning)
             {
@@ -278,7 +279,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Clears the current logs.
         /// </summary>
-        public static void ClearLogs()
+        public void ClearLogs()
         {
             logBuilder.Clear();
             OnLogUpdate?.Invoke();
@@ -300,7 +301,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         /// <summary>
         /// Cleans up the server process when the application quits.
         /// </summary>
-        public static void Cleanup()
+        public  void Cleanup()
         {
             if (IsRunning)
             {

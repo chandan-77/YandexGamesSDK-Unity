@@ -1,3 +1,4 @@
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +11,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private Vector2 logScrollPos;
         private string logText = "";
         private bool autoScroll = true;
+        
+        private NodeProxyServer _proxyServer;
 
         [MenuItem("Yandex Games SDK/Dashboard")]
         public static void ShowWindow()
@@ -20,8 +23,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private void OnEnable()
         {
             LoadConfig();
-       
-            LocalServerManager.OnLogUpdate += UpdateLogs;
+
+            _proxyServer = ProxyServerFactory.ProxyServer;
+            
+            _proxyServer.OnLogUpdate += UpdateLogs;
 
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorApplication.quitting += OnQuitting;
@@ -29,9 +34,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
         private void OnDisable()
         {
-            LocalServerManager.OnLogUpdate -= UpdateLogs;
-            LocalServerManager.Cleanup();
+            _proxyServer.Cleanup();
 
+            _proxyServer.OnLogUpdate -= UpdateLogs;
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             EditorApplication.quitting -= OnQuitting;
         }
@@ -65,6 +70,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             // General Settings
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"), new GUIContent("App ID"));
+            
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"), new GUIContent("Verbose Logging"));
 
             EditorGUILayout.Space();
@@ -99,18 +105,43 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             EditorGUILayout.LabelField("Local Server Controls", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginHorizontal();
-            if (LocalServerManager.IsRunning)
+            if (_proxyServer.IsRunning)
             {
                 if (GUILayout.Button("Stop Server"))
                 {
-                    LocalServerManager.StopServer();
+                    _proxyServer.StopServer();
                 }
             }
             else
             {
                 if (GUILayout.Button("Start Server"))
                 {
-                    StartServer();
+                    if (string.IsNullOrEmpty(config.appID))
+                    {
+                        if (EditorUtility.DisplayDialog("Invalid App ID", "Please insert the Yandex Games App Id.", "Ok."))
+                        {
+                            GUI.FocusControl("AppIDField");
+                        }
+                        return;
+                    }
+
+                    string indexPath = System.IO.Path.Combine(config.developmentSettings.buildPath, "index.html");
+
+                    if (!System.IO.File.Exists(indexPath))
+                    {
+                        if (EditorUtility.DisplayDialog("Invalid Build Path", 
+                            "The build path is not valid as it does not contain 'index.html'. Would you like to build the project to set a valid build path?", 
+                            "Yes, Build Now", "Cancel"))
+                        {
+                            config.developmentSettings.overrideOnBuild = true;
+                            config.developmentSettings.runLocalServerAfterBuild = true;
+                            
+                            EditorApplication.ExecuteMenuItem("File/Build And Run");
+                        }
+                        return;
+                    }
+
+                    _proxyServer.StartServer();
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -119,7 +150,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Server Status: ");
             GUIStyle statusStyle = new GUIStyle(EditorStyles.boldLabel);
-            if (LocalServerManager.IsRunning)
+            if (_proxyServer.IsRunning)
             {
                 statusStyle.normal.textColor = Color.green;
                 GUILayout.Label("Running", statusStyle);
@@ -141,7 +172,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             autoScroll = GUILayout.Toggle(autoScroll, "Auto-Scroll", GUILayout.Width(100));
             if (GUILayout.Button("Clear Logs"))
             {
-                LocalServerManager.ClearLogs();
+                _proxyServer.ClearLogs();
+                
                 logText = "";
             }
             EditorGUILayout.EndHorizontal();
@@ -157,23 +189,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             }
         }
 
-        private void StartServer()
-        {
-            string buildPath = config.developmentSettings.buildPath;
-            string port = config.developmentSettings.serverPort.ToString();
-
-            if (string.IsNullOrEmpty(buildPath))
-            {
-                EditorUtility.DisplayDialog("Error", "Build Path is not set.", "OK");
-                return;
-            }
-
-            LocalServerManager.StartLocalServer(buildPath, port);
-        }
-
         private void UpdateLogs()
         {
-            logText = LocalServerManager.Logs;
+            logText = _proxyServer.Logs;
         }
 
         private void LoadConfig()
@@ -203,13 +221,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             if (state == PlayModeStateChange.ExitingEditMode)
             {
                 Debug.Log("TODO: Play Mode is ExitingEditMode");
-                // LocalServerManager.StopServer();
             }
         }
 
         private void OnQuitting()
         {
-            LocalServerManager.Cleanup();
+            _proxyServer.Cleanup();
         }
     }
 }

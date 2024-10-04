@@ -101,7 +101,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             if (long.TryParse(serverTime, out long serverTimeMillis))
             {
-                // Convert milliseconds since Unix epoch to a DateTime
                 DateTime serverDateTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeMillis).UtcDateTime;
                 Debug.Log($"Parsed Server Time: {serverDateTime}");
 
@@ -148,7 +147,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             {
                 string errorMessage = message.StartsWith("false|") ? message.Substring(6) : "Unknown error";
                 Debug.LogError("Yandex SDK initialization failed in Unity: " + errorMessage);
-                // Handle initialization failure accordingly
             }
         }
 
