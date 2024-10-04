@@ -27,7 +27,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 
         public void StartServer()
         {
-            // Terminate the previous server process if it's still running
             if (serverProcess != null && !serverProcess.HasExited)
             {
                 serverProcess.Kill();
@@ -78,7 +77,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 WorkingDirectory = _config.developmentSettings.buildPath,
             };
 
-            // Log the PATH for debugging purposes
             UnityEngine.Debug.Log("Process PATH: " + startInfo.EnvironmentVariables["PATH"]);
 
             try
@@ -86,7 +84,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 serverProcess = new Process();
                 serverProcess.StartInfo = startInfo;
 
-                // Handle standard output
                 serverProcess.OutputDataReceived += (sender, args) =>
                 {
                     if (!string.IsNullOrEmpty(args.Data))
@@ -135,18 +132,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             }
         }
 
-        /// <summary>
-        /// Finds the path to 'node' dynamically by checking the system PATH and common install locations.
-        /// </summary>
         private string FindNodePath()
         {
             string nodeExecutableName = "node";
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
-                nodeExecutableName = "node.exe"; // On Windows, 'node' is 'node.exe'
+                nodeExecutableName = "node.exe"; 
             }
 
-            // First, try to find 'node' in the system PATH
             string pathEnv = Environment.GetEnvironmentVariable("PATH");
             string[] paths = pathEnv.Split(Path.PathSeparator);
 
@@ -160,7 +153,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 }
             }
 
-            // If not found, check common installation directories
             string[] commonPaths;
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
