@@ -1,50 +1,96 @@
 import { YandexGames } from "YandexGamesSDK";
 
 export class LeaderboardModule {
-    static async submitScore(leaderboardName: string, score: number): Promise<void> {
+    /**
+     * Submit a score to a leaderboard.
+     * @param {string} requestId - The unique request ID.
+     * @param {string} leaderboardName - The name of the leaderboard.
+     * @param {number} score - The score to submit.
+     * @param {string} [extraData] - Optional user description.
+     */
+    static async submitScore(requestId:string, leaderboardName:string, score:number, extraData = null) {
         try {
-            await window.yandexSDK.getLeaderboards().then(async (leaderboards: YandexGames.Leaderboards) => {
-                await leaderboards.setLeaderboardScore(leaderboardName, score);
-                unityInstance.SendMessage('YandexGamesSDK', 'OnSubmitScoreSuccess', '');
-            });
-        } catch (error: any) {
-            unityInstance.SendMessage('YandexGamesSDK', 'OnSubmitScoreFailure', error.message);
-        }
+            const sdk = await window.yandexSDK;
+            const leaderboards = await sdk.getLeaderboards();
 
+            // Check if the method is available
+            const isAvailable = await sdk.isAvailableMethod('leaderboards.setLeaderboardScore');
+            if (!isAvailable) {
+                throw new Error('setLeaderboardScore method is not available.');
+            }
+
+            await leaderboards.setLeaderboardScore(leaderboardName, score, extraData);
+            // Send success response
+            window.SendResponseToUnity(requestId, true, null, null);
+            console.log("Score submitted successfully to Unity.");
+        } catch (error:any) {
+            // Enhanced error handling
+            console.error("Error submitting score:", error.message || error);
+            window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to submit score.');
+        }
     }
 
-    static async getLeaderboardEntries(
-        leaderboardName: string,
-        offset: number,
-        limit: number
-    ): Promise<void> {
+    /**
+     * Get leaderboard entries.
+     * @param {string} requestId - The unique request ID.
+     * @param {string} leaderboardName - The name of the leaderboard.
+     * @param {number} quantityTop - Number of top entries to fetch.
+     * @param {number} quantityAround - Number of entries around the player.
+     * @param {boolean} includeUser - Whether to include the user's entry.
+     */
+    static async getLeaderboardEntries(requestId:string, leaderboardName:string, quantityTop = 5, quantityAround = 5, includeUser = true) {
         try {
-            await window.yandexSDK.getLeaderboards().then(async (leaderboards: YandexGames.Leaderboards) => {
-                const data = await leaderboards.getLeaderboardEntries(leaderboardName, {
-                    includeUser: true,
-                    quantityTop: offset + limit,
-                    quantityAround: 0,
-                });
-                const entries = data.entries.slice(offset, offset + limit);
-                const jsonData = JSON.stringify({ entries });
-                unityInstance.SendMessage('YandexGamesSDK', 'OnGetLeaderboardEntriesSuccess', jsonData);
-            });
-        } catch (error: any) {
-            unityInstance.SendMessage('YandexGamesSDK', 'OnGetLeaderboardEntriesFailure', error.message);
-        }
+            const sdk = await window.yandexSDK;
+            const leaderboards = await sdk.getLeaderboards();
 
+            // Check if the method is available
+            const isAvailable = await sdk.isAvailableMethod('leaderboards.getLeaderboardEntries');
+            if (!isAvailable) {
+                throw new Error('getLeaderboardEntries method is not available.');
+            }
+
+            const data = await leaderboards.getLeaderboardEntries(leaderboardName, {
+                includeUser: includeUser,
+                quantityTop: quantityTop,
+                quantityAround: quantityAround,
+            });
+
+            // Serialize entries to JSON
+            const jsonData = JSON.stringify(data);
+            // Send success response with data
+            window.SendResponseToUnity(requestId, true, jsonData, null);
+            console.log("Leaderboard entries fetched successfully and sent to Unity.");
+        } catch (error:any) {
+            console.error("Error fetching leaderboard entries:", error.message || error);
+            window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to fetch leaderboard entries.');
+        }
     }
 
-    static async getPlayerEntry(leaderboardName: string): Promise<void> {
+    /**
+     * Get the player's entry in a leaderboard.
+     * @param {string} requestId - The unique request ID.
+     * @param {string} leaderboardName - The name of the leaderboard.
+     */
+    static async getPlayerEntry(requestId:string, leaderboardName:string) {
         try {
-            await window.yandexSDK.getLeaderboards().then(async (leaderboards: YandexGames.Leaderboards) => {
-                const entry = await leaderboards.getLeaderboardPlayerEntry(leaderboardName);
-                const jsonData = JSON.stringify(entry);
-                unityInstance.SendMessage('YandexGamesSDK', 'OnGetPlayerEntrySuccess', jsonData);
-            });
-        } catch (error: any) {
-            unityInstance.SendMessage('YandexGamesSDK', 'OnGetPlayerEntryFailure', error.message);
-        }
+            const sdk = await window.yandexSDK;
+            const leaderboards = await sdk.getLeaderboards();
 
+            // Check if the method is available
+            const isAvailable = await sdk.isAvailableMethod('leaderboards.getLeaderboardPlayerEntry');
+            if (!isAvailable) {
+                throw new Error('getLeaderboardPlayerEntry method is not available.');
+            }
+
+            const entry = await leaderboards.getLeaderboardPlayerEntry(leaderboardName);
+            // Serialize entry to JSON
+            const jsonData = JSON.stringify(entry);
+            // Send success response with data
+            window.SendResponseToUnity(requestId, true, jsonData, null);
+            console.log("Player entry fetched successfully and sent to Unity.");
+        } catch (error:any) {
+            console.error("Error fetching player entry:", error.message || error);
+            window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to fetch player entry.');
+        }
     }
 }

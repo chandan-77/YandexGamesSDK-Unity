@@ -1,78 +1,78 @@
 using System;
 using System.Runtime.InteropServices;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
 {
+    public enum RewardedAdResponse
+    {
+        AdOpened,
+        AdGranted,
+        AdClosed
+    }
+
     public class AdvertisementModule : YGModuleBase, IAdvertisementModule
     {
-        private Action<bool, string> bannerCallback;
-        
-        private Action<bool, string> rewardedCallback;
-        private Action rewardedOnOpenCallback;
-        private Action rewardedOnRewardCallback;
-        private Action rewardedOnCloseCallback;
-        
-        private Action<bool, string> interstitialCallback;
-        private Action interstitialOnOpenCallback;
-        private Action interstitialOnOfflineCallback;
-        private Action interstitialOnCloseCallback;
-
-
         public override void Initialize()
         {
         }
 
-        // Interstitial Ad
         [DllImport("__Internal")]
-        private static extern void ShowInterstitialAd();
-
-        // Rewarded Ad
-        [DllImport("__Internal")]
-        private static extern void ShowRewardedAd();
-
-        // Banner Ad
-        [DllImport("__Internal")]
-        private static extern void ShowBannerAd(string position);
+        private static extern void ShowInterstitialAd(string requestId);
 
         [DllImport("__Internal")]
-        private static extern void HideBannerAd();
+        private static extern void ShowRewardedAd(string requestId);
 
+        [DllImport("__Internal")]
+        private static extern void ShowBannerAd(string requestId, string position);
+
+        [DllImport("__Internal")]
+        private static extern void HideBannerAd(string requestId);
 
         public void ShowInterstitialAd(Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            interstitialCallback = callback;
-            ShowInterstitialAd();
+            string requestId = YGRequestManager.GenerateRequestId();
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, error);
+            });
+
+            ShowInterstitialAd(requestId);
 #else
             Debug.Log("Interstitial ads are only available in WebGL builds.");
             callback?.Invoke(false, "Interstitial ads are only available in WebGL builds.");
 #endif
         }
 
-
-        public void ShowRewardedAd(Action<bool, string> callback = null,
-            Action onOpen = null, Action onReward = null, Action onClose = null)
+        public void ShowRewardedAd(Action<bool, string, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
- rewardedCallback = callback;
-            rewardedOnRewardCallback = onReward;
-            rewardedOnOpenCallback = onOpen;
-            rewardedOnCloseCallback = onClose;
-            rewardedCallback = callback;
-            ShowRewardedAd();
+            string requestId = YGRequestManager.GenerateRequestId();
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, data, error);
+            });
+
+            ShowRewardedAd(requestId);
 #else
             Debug.Log("Rewarded ads are only available in WebGL builds.");
-            callback?.Invoke(false, "Rewarded ads are only available in WebGL builds.");
+            callback?.Invoke(false, null,"Rewarded ads are only available in WebGL builds.");
 #endif
         }
 
         public void ShowBannerAd(string position, Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            bannerCallback = callback;
-            ShowBannerAd(position);
+            string requestId = YGRequestManager.GenerateRequestId();
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, error);
+            });
+
+            ShowBannerAd(requestId, position);
 #else
             Debug.Log("Banner ads are only available in WebGL builds.");
             callback?.Invoke(false, "Banner ads are only available in WebGL builds.");
@@ -82,69 +82,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
         public void HideBannerAd(Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            bannerCallback = callback;
-            HideBannerAd();
+            string requestId = YGRequestManager.GenerateRequestId();
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, error);
+            });
+
+            HideBannerAd(requestId);
 #else
             Debug.Log("Banner ads are only available in WebGL builds.");
             callback?.Invoke(false, "Banner ads are only available in WebGL builds.");
 #endif
-        }
-
-        // Callbacks from JavaScript
-        private void OnInterstitialAdCompleted(string message)
-        {
-            bool success = message.StartsWith("true");
-            string error = success ? null : message.Split('|')[1];
-            interstitialCallback?.Invoke(success, error);
-        }
-
-        private void OnInterstitialAdOpen(string message)
-        {
-            interstitialOnOpenCallback?.Invoke();
-        }
-        private void OnInterstitialAdClose(string message)
-        {
-            interstitialOnCloseCallback?.Invoke();
-        }
-        
-        private void OnInterstitialAdOffline(string message)
-        {
-            interstitialOnOfflineCallback?.Invoke();
-        }
-
-        private void OnRewardedAdCompleted(string message)
-        {
-            bool success = message.StartsWith("true");
-            string error = success ? null : message.Split('|')[1];
-            rewardedCallback?.Invoke(success, error);
-        }
-
-        private void OnRewardedAdOpen(string message)
-        {
-            rewardedOnOpenCallback?.Invoke();
-        }
-        private void OnRewardedAdClose(string message)
-        {
-            rewardedOnCloseCallback?.Invoke();
-        }
-        
-        private void OnRewardedAdReward(string message)
-        {
-            rewardedOnRewardCallback?.Invoke();
-        }
-
-        private void OnBannerAdLoaded(string message)
-        {
-            bool success = message.StartsWith("true");
-            string error = success ? null : message.Split('|')[1];
-            bannerCallback?.Invoke(success, error);
-        }
-
-        private void OnBannerAdHidden(string message)
-        {
-            bool success = message.StartsWith("true");
-            string error = success ? null : message.Split('|')[1];
-            bannerCallback?.Invoke(success, error);
         }
     }
 }

@@ -4,7 +4,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
 {
     public interface ICloudStorageModule
     {
-         void SaveData(string key, object data, Action<bool, string> callback = null);
-         void LoadData(string key, Action<bool, string> callback = null);
+        void Save<TData>(string key, TData data, Action<bool, string> callback = null);
+        void Save(string key, object data, Action<bool, string> callback = null);
+        void Load<TData>(string key, Action<bool, TData, string> callback = null);
+        void Load(string key, Action<bool, object, string> callback = null);
     }
 }

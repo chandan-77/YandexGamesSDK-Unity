@@ -1,45 +1,47 @@
 using System;
 using System.Runtime.InteropServices;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
-using IAuthenticationModule = PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication.IAuthenticationModule;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public class AuthenticationModule : YGModuleBase, IAuthenticationModule
     {
         public UserProfile CurrentUser { get; private set; }
-        private Action<bool, string> authenticationCallback;
 
         [DllImport("__Internal")]
-        private static extern void AuthenticateUser(bool requireSignin);
+        private static extern void AuthenticateUser(string requestId, bool requireSignin);
 
         public override void Initialize()
         {
         }
 
-        public void AuthenticateUser(Action<bool, string> callback, bool requireSignin = false)
+        public void AuthenticateUser(bool requireSignin, Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-        authenticationCallback = callback;
-        AuthenticateUser(requireSignin);
+            string requestId = YGRequestManager.GenerateRequestId();
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                if (success && !string.IsNullOrEmpty(data))
+                {
+                    // Deserialize the profile data
+                    CurrentUser = JsonUtility.FromJson<UserProfile>(data);
+                    callback?.Invoke(true, null);
+                }
+                else
+                {
+                    Debug.LogError($"Authentication failed: {error}");
+                    callback?.Invoke(false, error);
+                }
+            });
+
+            AuthenticateUser(requestId, requireSignin);
 #else
             Debug.Log("Authentication is only available in WebGL builds.");
-            callback(false, "Authentication is only available in WebGL builds.");
+            callback?.Invoke(false, "Authentication is only available in WebGL builds.");
 #endif
-        }
-
-        public void OnAuthenticationSuccess(string jsonProfile)
-        {
-            CurrentUser = JsonUtility.FromJson<UserProfile>(jsonProfile);
-            authenticationCallback?.Invoke(true, null);
-        }
-
-        public void OnAuthenticationFailure(string error)
-        {
-            Debug.LogError($"Authentication failed: {error}");
-            authenticationCallback?.Invoke(false, error);
         }
 
         public UserProfile GetUserProfile()

@@ -1,29 +1,31 @@
 mergeInto(LibraryManager.library, {
 
-  AuthenticateUser: function(requireSigninPtr) {
+  AuthenticateUser: function(requestIdPtr, requireSigninPtr) {
     if (typeof window.YandexSDKExports.AuthenticateUser === 'function') {
-      var requireSignin = requireSigninPtr;
-      window.YandexSDKExports.AuthenticateUser(requireSignin);
+      var requestId = UTF8ToString(requestIdPtr);
+var requireSignin = requireSigninPtr;
+      window.YandexSDKExports.AuthenticateUser(requestId, requireSignin);
     } else {
       console.error('AuthenticateUser is not defined on window.YandexSDKExports.');
     }
   },
 
-  SavePlayerData: function(keyPtr, dataPtr, flushPtr) {
+  SavePlayerData: function(requestIdPtr, keyPtr, dataPtr) {
     if (typeof window.YandexSDKExports.SavePlayerData === 'function') {
-      var key = UTF8ToString(keyPtr);
+      var requestId = UTF8ToString(requestIdPtr);
+var key = UTF8ToString(keyPtr);
 var data = UTF8ToString(dataPtr);
-var flush = flushPtr;
-      window.YandexSDKExports.SavePlayerData(key, data, flush);
+      window.YandexSDKExports.SavePlayerData(requestId, key, data);
     } else {
       console.error('SavePlayerData is not defined on window.YandexSDKExports.');
     }
   },
 
-  LoadPlayerData: function(keyPtr) {
+  LoadPlayerData: function(requestIdPtr, keyPtr) {
     if (typeof window.YandexSDKExports.LoadPlayerData === 'function') {
-      var key = UTF8ToString(keyPtr);
-      window.YandexSDKExports.LoadPlayerData(key);
+      var requestId = UTF8ToString(requestIdPtr);
+var key = UTF8ToString(keyPtr);
+      window.YandexSDKExports.LoadPlayerData(requestId, key);
     } else {
       console.error('LoadPlayerData is not defined on window.YandexSDKExports.');
     }
@@ -65,31 +67,36 @@ var flush = flushPtr;
     }
   },
 
-  SubmitScore: function(leaderboardNamePtr, scorePtr) {
+  SubmitScore: function(requestIdPtr, leaderboardNamePtr, scorePtr, extraDataPtr) {
     if (typeof window.YandexSDKExports.SubmitScore === 'function') {
-      var leaderboardName = UTF8ToString(leaderboardNamePtr);
+      var requestId = UTF8ToString(requestIdPtr);
+var leaderboardName = UTF8ToString(leaderboardNamePtr);
 var score = scorePtr;
-      window.YandexSDKExports.SubmitScore(leaderboardName, score);
+var extraData = extraDataPtr;
+      window.YandexSDKExports.SubmitScore(requestId, leaderboardName, score, extraData);
     } else {
       console.error('SubmitScore is not defined on window.YandexSDKExports.');
     }
   },
 
-  GetLeaderboardEntries: function(leaderboardNamePtr, offsetPtr, limitPtr) {
+  GetLeaderboardEntries: function(requestIdPtr, leaderboardNamePtr, quantityTopPtr, quantityAroundPtr, includeUserPtr) {
     if (typeof window.YandexSDKExports.GetLeaderboardEntries === 'function') {
-      var leaderboardName = UTF8ToString(leaderboardNamePtr);
-var offset = offsetPtr;
-var limit = limitPtr;
-      window.YandexSDKExports.GetLeaderboardEntries(leaderboardName, offset, limit);
+      var requestId = UTF8ToString(requestIdPtr);
+var leaderboardName = UTF8ToString(leaderboardNamePtr);
+var quantityTop = quantityTopPtr;
+var quantityAround = quantityAroundPtr;
+var includeUser = includeUserPtr;
+      window.YandexSDKExports.GetLeaderboardEntries(requestId, leaderboardName, quantityTop, quantityAround, includeUser);
     } else {
       console.error('GetLeaderboardEntries is not defined on window.YandexSDKExports.');
     }
   },
 
-  GetPlayerEntry: function(leaderboardNamePtr) {
+  GetPlayerEntry: function(requestIdPtr, leaderboardNamePtr) {
     if (typeof window.YandexSDKExports.GetPlayerEntry === 'function') {
-      var leaderboardName = UTF8ToString(leaderboardNamePtr);
-      window.YandexSDKExports.GetPlayerEntry(leaderboardName);
+      var requestId = UTF8ToString(requestIdPtr);
+var leaderboardName = UTF8ToString(leaderboardNamePtr);
+      window.YandexSDKExports.GetPlayerEntry(requestId, leaderboardName);
     } else {
       console.error('GetPlayerEntry is not defined on window.YandexSDKExports.');
     }
@@ -122,37 +129,38 @@ var limit = limitPtr;
     }
   },
 
-  HideBannerAd: function() {
+  HideBannerAd: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.HideBannerAd === 'function') {
-      
-      window.YandexSDKExports.HideBannerAd();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.HideBannerAd(requestId);
     } else {
       console.error('HideBannerAd is not defined on window.YandexSDKExports.');
     }
   },
 
-  ShowBannerAd: function(positionPtr) {
+  ShowBannerAd: function(requestIdPtr, positionPtr) {
     if (typeof window.YandexSDKExports.ShowBannerAd === 'function') {
-      var position = UTF8ToString(positionPtr);
-      window.YandexSDKExports.ShowBannerAd(position);
+      var requestId = UTF8ToString(requestIdPtr);
+var position = UTF8ToString(positionPtr);
+      window.YandexSDKExports.ShowBannerAd(requestId, position);
     } else {
       console.error('ShowBannerAd is not defined on window.YandexSDKExports.');
     }
   },
 
-  ShowInterstitialAd: function() {
+  ShowInterstitialAd: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.ShowInterstitialAd === 'function') {
-      
-      window.YandexSDKExports.ShowInterstitialAd();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.ShowInterstitialAd(requestId);
     } else {
       console.error('ShowInterstitialAd is not defined on window.YandexSDKExports.');
     }
   },
 
-  ShowRewardedAd: function() {
+  ShowRewardedAd: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.ShowRewardedAd === 'function') {
-      
-      window.YandexSDKExports.ShowRewardedAd();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.ShowRewardedAd(requestId);
     } else {
       console.error('ShowRewardedAd is not defined on window.YandexSDKExports.');
     }
