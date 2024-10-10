@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    [Serializable]
     public struct PlayerData
     {
         public string playerName;
@@ -16,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        YandexGamesSDK.Instance.Authentication.AuthenticateUser((isAuh, error) =>
+        YandexGamesSDK.Instance.Authentication.AuthenticateUser(true, (isAuh, error) =>
         {
             Debug.Log("IsAuth: " + isAuh);
 
@@ -24,81 +25,97 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
             }
-        }, true);
-        
-        YandexGamesSDK.Instance.GetServerTime((isFetched, time) =>
-        {
-            Debug.Log("GetServerTime: " + time);
-        });
-        
-        YandexGamesSDK.Instance.GetEnvironment((isFetched, env) =>
-        {
-            Debug.Log("GetEnvironment: " + env.i18n.lang);
         });
 
+        YandexGamesSDK.Instance.GetServerTime((isFetched, time) => { Debug.Log("GetServerTime: " + time); });
+
+        YandexGamesSDK.Instance.GetEnvironment((isFetched, env) => { Debug.Log("GetEnvironment: " + env.i18n.lang); });
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.S))
         {
-            YandexGamesSDK.Instance.Advertisement.ShowRewardedAd((a,v) =>{},
-                
-                onOpen: delegate
-                {
-                    Debug.Log("OnOpen");
-                },
-                onClose: delegate
-                {
-                    Debug.Log("OnClose");
-                },
-                onReward: delegate
-                {
-                    Debug.Log("OnReward");
-                });
-            YandexGamesSDK.Instance.CloudStorage.SaveData("testData", new PlayerData()
-            {
-                level = "1",
-                playerName = "SavedPlayer"
-            }, delegate { Debug.Log("Player saved."); });
-        }
+            var playerData = new PlayerData { playerName = "TestPlayer", level = "TestLevel" };
 
+            for (int i = 0; i < 10; i++)
+            {
+                YandexGamesSDK.Instance.CloudStorage.Save($"primit_{i}", Random.Range(0, 19), (success, error) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log("Player data saved successfully.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to save player data: {error}");
+                    }
+                });
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            YandexGamesSDK.Instance.CloudStorage.LoadData("testData",
-                (a, b) => { Debug.Log($"Loading data: {a}, {b}"); });
+            for (int i = 0; i < 10; i++)
+            {
+                YandexGamesSDK.Instance.CloudStorage.Load($"primit_{i}", (success, data, error) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log($"Loaded player data: int={data}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to load player data: {error}");
+                    }
+                });
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.K))
         {
             YandexGamesSDK.Instance.Leaderboard.GetLeaderboardEntries("testLeaderboard", 0, 10,
-                (list, s) => { Debug.Log($"Get leaderboard entries: {JsonUtility.ToJson(list)} for {s}"); });
+                true, (list, s) => { Debug.Log($"Get leaderboard entries: {JsonUtility.ToJson(list)} for {s}"); });
         }
 
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKeyDown(KeyCode.A))
         {
-            YandexGamesSDK.Instance.Leaderboard.SubmitScore("testLeaderboard", 100,
-                (isSet, error) =>
+            YandexGamesSDK.Instance.Advertisement.ShowRewardedAd((success, adType, error) =>
+            {
+                if (success)
                 {
-                    if (isSet)
+                    switch (Enum.Parse(typeof(RewardedAdResponse), adType))
                     {
-                        Debug.Log("Score submitted");
+                        case RewardedAdResponse.AdGranted:
+                            Debug.Log("Rewarded ad collect.");
+                            break;
+                        case RewardedAdResponse.AdClosed:
+                            Debug.Log("Rewarded ad closed.");
+                            break;
+                        case RewardedAdResponse.AdOpened:
+                            Debug.Log("Rewarded ad opened.");
+                            break;
+                        default:
+                            Debug.Log($"Rewarded ad response type is invalid: {adType}");
+                            break;
                     }
-                    else
-                    {
-                        Debug.Log($"Leaderboard set failed {error}");
-                    }
-                });
-        }
-        
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            YandexGamesSDK.Instance.Leaderboard.GetPlayerEntry("testLeaderboard",
-                (leaderBoard, error) =>
+                }
+            });
+
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                YandexGamesSDK.Instance.Leaderboard.SubmitScore("testLeaderboard", 100, callback: (success, error) =>
                 {
-                    Debug.Log(JsonUtility.ToJson(leaderBoard));
+                    Debug.Log($"Submit score: {success}");
+                    Debug.Log($"error: {error}");
                 });
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                YandexGamesSDK.Instance.Leaderboard.GetPlayerEntry("testLeaderboard",
+                    (leaderBoard, error) => { Debug.Log(JsonUtility.ToJson(leaderBoard)); });
+            }
         }
     }
 }

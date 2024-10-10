@@ -5,6 +5,7 @@ using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
 using UnityEngine;
 
@@ -165,6 +166,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             module.Initialize();
 
             return module;
+        }
+        
+        // This method will be called from JavaScript
+        public void OnJSResponse(string jsonResponse)
+        {
+            YGRequestManager.HandleJSResponse(jsonResponse);
         }
     }
 }

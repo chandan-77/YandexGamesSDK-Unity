@@ -17,6 +17,7 @@ interface Window {
   SDKExports: ISDKExports;
   YandexSDKVersion: string;
   unityInstance: UnityInstance;
+  SendResponseToUnity: any;
 }
 
 

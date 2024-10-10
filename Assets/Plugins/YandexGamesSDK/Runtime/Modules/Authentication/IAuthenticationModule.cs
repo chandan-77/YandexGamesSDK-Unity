@@ -5,7 +5,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public interface IAuthenticationModule
     {
-        void AuthenticateUser(Action<bool, string> callback, bool requireSignin = false);
+        void AuthenticateUser(bool requireSignin, Action<bool, string> callback = null);
         UserProfile GetUserProfile();
     }
 }

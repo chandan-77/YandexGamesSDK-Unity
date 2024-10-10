@@ -1,35 +1,44 @@
-import { Utils } from "../../system/utils";
-import { YandexGames } from "YandexGamesSDK";
-
 export class StorageModule {
-    static async savePlayerData(key: string, data: string, flush: boolean = true): Promise<void> {
+    static async savePlayerData(requestId: string, key: string, data: string) {
         try {
-            const player:YandexGames.Player = await window.yandexSDK.getPlayer();
-            await player.setData({ [key]: data }, flush);
+            console.log('savePlayerData called with:', { requestId, key, data });
 
-            unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', 'true');
+            const player = await window.yandexSDK.getPlayer();
+            await player.setData({ [key]: data }, true);
+
+            console.log(`Saving data for ${key}:`, data);
+
+            // Send success response to Unity
+            window.SendResponseToUnity(requestId, true, null, null);
         } catch (error: any) {
             console.error("Failed to save player data:", error.message);
-            unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataSaved', `false|${error.message}`);
+            // Send error response to Unity
+            window.SendResponseToUnity(requestId, false, null, error.message);
         }
     }
 
-    static async loadPlayerData(key: string): Promise<void> {
+    static async loadPlayerData(requestId: string, key: string) {
         try {
+            console.log('loadPlayerData called with:', { requestId, key });
+
             const player = await window.yandexSDK.getPlayer();
             const result = await player.getData([key]);
 
             if (result && result.hasOwnProperty(key)) {
                 const data = result[key];
-                console.log(`Loaded player data from Yandex for key: ${key}`, data);
-                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', JSON.stringify({ success: true, data }));
+                console.log(`Loaded player data for key ${key}:`, data);
+
+                // Send success response to Unity with data
+                window.SendResponseToUnity(requestId, true, data, null);
             } else {
-                console.warn(`No data found in Yandex for key: ${key}`);
-                unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', 'false|No data found for the given key');
+                console.warn(`No data found for key: ${key}`);
+                // Send error response to Unity
+                window.SendResponseToUnity(requestId, false, null, 'No data found for the given key');
             }
         } catch (error: any) {
             console.error("Failed to load player data:", error.message);
-            unityInstance.SendMessage('YandexGamesSDK', 'OnPlayerDataLoaded', `false|${error.message}`);
+            // Send error response to Unity
+            window.SendResponseToUnity(requestId, false, null, error.message);
         }
     }
 }
