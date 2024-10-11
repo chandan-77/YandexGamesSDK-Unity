@@ -1,44 +1,70 @@
 export class StorageModule {
-    static async savePlayerData(requestId: string, key: string, data: string) {
-        try {
-            console.log('savePlayerData called with:', { requestId, key, data });
+    private static queue: Array<() => Promise<void>> = [];
+    private static isProcessing: boolean = false;
 
-            const player = await window.yandexSDK.getPlayer();
-            await player.setData({ [key]: data }, true);
+    private static async processQueue() {
+        if (StorageModule.isProcessing || StorageModule.queue.length === 0) return;
 
-            console.log(`Saving data for ${key}:`, data);
+        StorageModule.isProcessing = true;
 
-            // Send success response to Unity
-            window.SendResponseToUnity(requestId, true, null, null);
-        } catch (error: any) {
-            console.error("Failed to save player data:", error.message);
-            // Send error response to Unity
-            window.SendResponseToUnity(requestId, false, null, error.message);
+        while (StorageModule.queue.length > 0) {
+            const task = StorageModule.queue.shift();
+            if (task) {
+                try {
+                    await task();
+                } catch (error) {
+                    console.error("Error executing task:", error);
+                }
+            }
         }
+
+        StorageModule.isProcessing = false;
     }
 
-    static async loadPlayerData(requestId: string, key: string) {
-        try {
-            console.log('loadPlayerData called with:', { requestId, key });
+    static savePlayerData(requestId: string, key: string, data: string) {
+        StorageModule.queue.push(async () => {
+            try {
+                console.log('savePlayerData called with:', { requestId, key, data });
 
-            const player = await window.yandexSDK.getPlayer();
-            const result = await player.getData([key]);
+                const player = await window.yandexSDK.getPlayer();
+                await player.setData({ [key]: data }, true);
 
-            if (result && result.hasOwnProperty(key)) {
-                const data = result[key];
-                console.log(`Loaded player data for key ${key}:`, data);
+                console.log(`Saving data for ${key}:`, data);
 
-                // Send success response to Unity with data
-                window.SendResponseToUnity(requestId, true, data, null);
-            } else {
-                console.warn(`No data found for key: ${key}`);
-                // Send error response to Unity
-                window.SendResponseToUnity(requestId, false, null, 'No data found for the given key');
+                window.SendResponseToUnity(requestId, true, null, null);
+            } catch (error: any) {
+                console.error("Failed to save player data:", error.message);
+                window.SendResponseToUnity(requestId, false, null, error.message);
             }
-        } catch (error: any) {
-            console.error("Failed to load player data:", error.message);
-            // Send error response to Unity
-            window.SendResponseToUnity(requestId, false, null, error.message);
-        }
+        });
+
+        StorageModule.processQueue();
+    }
+
+    static loadPlayerData(requestId: string, key: string) {
+        StorageModule.queue.push(async () => {
+            try {
+                console.log('loadPlayerData called with:', { requestId, key });
+
+                const player = await window.yandexSDK.getPlayer();
+                const result = await player.getData([key]);
+
+                if (result && result.hasOwnProperty(key)) {
+                    const data = result[key];
+                    console.log(`Loaded player data for key ${key}:`, data);
+
+                    window.SendResponseToUnity(requestId, true, data, null);
+                } else {
+                    console.warn(`No data found for key: ${key}`);
+                    window.SendResponseToUnity(requestId, false, null, 'No data found for the given key');
+                }
+            } catch (error: any) {
+                console.error("Failed to load player data:", error.message);
+
+                window.SendResponseToUnity(requestId, false, null, error.message);
+            }
+        });
+
+        StorageModule.processQueue();
     }
 }

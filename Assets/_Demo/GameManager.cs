@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             YandexGamesSDK.Instance.Leaderboard.GetLeaderboardEntries("testLeaderboard", 0, 10,
-                true, (list, s) => { Debug.Log($"Get leaderboard entries: {JsonUtility.ToJson(list)} for {s}"); });
+                false, (list, s) => { Debug.Log($"Get leaderboard entries: {JsonUtility.ToJson(list)} for {list?.Leaderboard?.Name}"); });
         }
 
         if (Input.GetKeyDown(KeyCode.A))

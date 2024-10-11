@@ -55,7 +55,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
         /// <param name="quantityAround">Number of entries around the player.</param>
         /// <param name="includeUser">Whether to include the user's entry.</param>
         /// <param name="callback">Callback invoked upon completion with leaderboard data.</param>
-        public void GetLeaderboardEntries(string leaderboardName, int quantityTop, int quantityAround, bool includeUser, Action<List<LeaderboardEntry>, string> callback = null)
+        public void GetLeaderboardEntries(string leaderboardName, int quantityTop, int quantityAround, bool includeUser, Action<LeaderboardEntriesResponse, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -65,7 +65,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
                 {
                     try
                     {
-                        var leaderboardEntries = JsonConvert.DeserializeObject<List<LeaderboardEntry>>(data);
+                        var leaderboardEntries = JsonConvert.DeserializeObject<LeaderboardEntriesResponse>(data);
                         callback?.Invoke(leaderboardEntries, null);
                     }
                     catch (Exception ex)
