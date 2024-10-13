@@ -69,8 +69,8 @@ export class YandexGamesSDK {
     private static async loadYandexSDK(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
-            // script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
-            script.src = '/sdk.js'; // Yandex SDK URL
+            script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
+            //script.src = '/sdk.js'; // Yandex SDK URL
             script.onload = () => YandexGamesSDK.onYandexSDKLoaded().then(resolve).catch(reject);
             script.onerror = () => {
                 console.error('Failed to load Yandex SDK script');

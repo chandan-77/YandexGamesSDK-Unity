@@ -9,6 +9,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+    [Serializable]
     public struct PlayerData
     {
         public string playerName;
@@ -17,14 +18,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        YandexGamesSDK.Instance.Authentication.AuthenticateUser(true, (isAuh, error) =>
+        YandexGamesSDK.Instance.CloudStorage.Save("salam", new
         {
-            Debug.Log("IsAuth: " + isAuh);
-
-            if (isAuh)
-            {
-                Debug.Log(YandexGamesSDK.Instance.Authentication.GetUserProfile().name);
-            }
+            name = "salam",
+            
         });
 
         YandexGamesSDK.Instance.GetServerTime((isFetched, time) => { Debug.Log("GetServerTime: " + time); });

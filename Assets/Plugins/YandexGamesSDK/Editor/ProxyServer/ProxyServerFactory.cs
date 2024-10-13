@@ -1,11 +1,12 @@
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 {
     public static class ProxyServerFactory
     {
-        public static NodeProxyServer ProxyServer => _proxyServer ??= new NodeProxyServer(YandexGamesSDKConfig.Instance);
+        public static IProxyServer ProxyServer => _proxyServer ??= new InternalProxyServer(YandexGamesSDKConfig.Instance);
 
-        private static NodeProxyServer _proxyServer;
+        private static IProxyServer _proxyServer;
     }
 }
