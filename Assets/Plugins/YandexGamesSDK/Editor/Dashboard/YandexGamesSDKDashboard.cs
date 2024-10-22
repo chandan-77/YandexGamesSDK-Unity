@@ -1,4 +1,6 @@
+using System;
 using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer;
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEditor;
 using UnityEngine;
@@ -11,8 +13,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private Vector2 logScrollPos;
         private string logText = "";
         private bool autoScroll = true;
-        
-        private NodeProxyServer _proxyServer;
+
+        private IProxyServer _proxyServer;
 
         [MenuItem("Yandex Games SDK/Dashboard")]
         public static void ShowWindow()
@@ -23,9 +25,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private void OnEnable()
         {
             LoadConfig();
-
             _proxyServer = ProxyServerFactory.ProxyServer;
-            
+
             _proxyServer.OnLogUpdate += UpdateLogs;
 
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
@@ -47,7 +48,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
             if (config == null)
             {
-                EditorGUILayout.HelpBox("YandexGamesSDKConfig asset not found. Please create one.", MessageType.Warning);
+                EditorGUILayout.HelpBox("YandexGamesSDKConfig asset not found. Please create one.",
+                    MessageType.Warning);
 
                 if (GUILayout.Button("Create Config Asset"))
                 {
@@ -59,7 +61,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
             // Display Config Asset Field
             EditorGUILayout.LabelField("Configuration", EditorStyles.boldLabel);
-            config = (YandexGamesSDKConfig)EditorGUILayout.ObjectField("Config Asset", config, typeof(YandexGamesSDKConfig), false);
+            config = (YandexGamesSDKConfig)EditorGUILayout.ObjectField("Config Asset", config,
+                typeof(YandexGamesSDKConfig), false);
 
             EditorGUILayout.Space();
 
@@ -70,14 +73,16 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             // General Settings
             EditorGUILayout.LabelField("General Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("appID"), new GUIContent("App ID"));
-            
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"), new GUIContent("Verbose Logging"));
+
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("verboseLogging"),
+                new GUIContent("Verbose Logging"));
 
             EditorGUILayout.Space();
 
             // Mock Data
             EditorGUILayout.LabelField("Mock Data", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedConfig.FindProperty("useMockData"), new GUIContent("Use Mock Data"));
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("useMockData"),
+                new GUIContent("Use Mock Data"));
             if (config.useMockData)
             {
                 EditorGUI.indentLevel++;
@@ -85,6 +90,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 EditorGUI.indentLevel--;
             }
 
+            EditorGUILayout.Space();
+
+            // Pause Settings
+              
+            EditorGUILayout.LabelField("Pause Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("pauseSettings"), true);
+            
             EditorGUILayout.Space();
 
             // Development Settings
@@ -109,7 +121,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             {
                 if (GUILayout.Button("Stop Server"))
                 {
-                    _proxyServer.StopServer();
+                    _proxyServer.StopProxyServer();
                 }
             }
             else
@@ -118,10 +130,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 {
                     if (string.IsNullOrEmpty(config.appID))
                     {
-                        if (EditorUtility.DisplayDialog("Invalid App ID", "Please insert the Yandex Games App Id.", "Ok."))
+                        if (EditorUtility.DisplayDialog("Invalid App ID", "Please insert the Yandex Games App Id.",
+                                "Ok."))
                         {
                             GUI.FocusControl("AppIDField");
                         }
+
                         return;
                     }
 
@@ -129,21 +143,23 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
                     if (!System.IO.File.Exists(indexPath))
                     {
-                        if (EditorUtility.DisplayDialog("Invalid Build Path", 
-                            "The build path is not valid as it does not contain 'index.html'. Would you like to build the project to set a valid build path?", 
-                            "Yes, Build Now", "Cancel"))
+                        if (EditorUtility.DisplayDialog("Invalid Build Path",
+                                "The build path is not valid as it does not contain 'index.html'. Would you like to build the project to set a valid build path?",
+                                "Yes, Build Now", "Cancel"))
                         {
                             config.developmentSettings.overrideOnBuild = true;
                             config.developmentSettings.runLocalServerAfterBuild = true;
-                            
+
                             EditorApplication.ExecuteMenuItem("File/Build And Run");
                         }
+
                         return;
                     }
 
-                    _proxyServer.StartServer();
+                    _proxyServer.StartProxyServer();
                 }
             }
+
             EditorGUILayout.EndHorizontal();
 
             // Server Status Indicator
@@ -160,6 +176,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 statusStyle.normal.textColor = Color.red;
                 GUILayout.Label("Stopped", statusStyle);
             }
+
             EditorGUILayout.EndHorizontal();
         }
 
@@ -173,9 +190,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             if (GUILayout.Button("Clear Logs"))
             {
                 _proxyServer.ClearLogs();
-                
+
                 logText = "";
             }
+
             EditorGUILayout.EndHorizontal();
 
             logScrollPos = EditorGUILayout.BeginScrollView(logScrollPos, GUILayout.Height(300));

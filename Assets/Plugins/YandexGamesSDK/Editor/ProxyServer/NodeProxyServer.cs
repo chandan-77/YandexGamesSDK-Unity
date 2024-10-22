@@ -4,12 +4,13 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 {
-    public class NodeProxyServer
+    public class NodeProxyServer : IProxyServer
     {
         private Process serverProcess;
         private StringBuilder logBuilder = new StringBuilder();
@@ -20,12 +21,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
         public event Action OnLogUpdate;
 
         private YandexGamesSDKConfig _config;
+
         public NodeProxyServer(YandexGamesSDKConfig config)
         {
             _config = config;
         }
 
-        public void StartServer()
+        public void StartProxyServer()
         {
             if (serverProcess != null && !serverProcess.HasExited)
             {
@@ -39,13 +41,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             string nodeExecutable = FindNodePath();
             if (string.IsNullOrEmpty(nodeExecutable))
             {
-                var err = "Unable to find 'node'. Please ensure that Node.js is installed and available in your system PATH.";
-             
+                var err =
+                    "Unable to find 'node'. Please ensure that Node.js is installed and available in your system PATH.";
+
                 UnityEngine.Debug.LogError(err);
                 logBuilder.AppendLine(err);
 
                 OnLogUpdate?.Invoke();
-                
+
                 return;
             }
 
@@ -53,13 +56,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 
             if (string.IsNullOrEmpty(npxPath))
             {
-                var err =  "Unable to find 'npx'. Please ensure that Node.js and npm are installed and 'npx' is available in your system PATH.";
+                var err =
+                    "Unable to find 'npx'. Please ensure that Node.js and npm are installed and 'npx' is available in your system PATH.";
 
                 UnityEngine.Debug.LogError(err);
                 logBuilder.AppendLine(err);
 
                 OnLogUpdate?.Invoke();
-                
+
                 return;
             }
 
@@ -137,7 +141,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             string nodeExecutableName = "node";
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
-                nodeExecutableName = "node.exe"; 
+                nodeExecutableName = "node.exe";
             }
 
             string pathEnv = Environment.GetEnvironmentVariable("PATH");
@@ -182,22 +186,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 }
             }
 
-            // Not found
             return null;
         }
 
-        /// <summary>
-        /// Finds the path to 'npx' dynamically by checking the system PATH and common install locations.
-        /// </summary>
         private string FindNpxPath()
         {
             string npxExecutableName = "npx";
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
-                npxExecutableName = "npx.cmd"; // On Windows, 'npx' is 'npx.cmd'
+                npxExecutableName = "npx.cmd";
             }
 
-            // First, try to find 'npx' in the system PATH
             string pathEnv = Environment.GetEnvironmentVariable("PATH");
             string[] paths = pathEnv.Split(Path.PathSeparator);
 
@@ -211,7 +210,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 }
             }
 
-            // If not found, check common installation directories
             string[] commonPaths;
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
@@ -241,21 +239,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 }
             }
 
-            // Not found
             return null;
         }
 
-        /// <summary>
-        /// Stops the local server if it's running.
-        /// </summary>
-        public void StopServer()
+        public void StopProxyServer()
         {
             if (IsRunning)
             {
                 try
                 {
                     serverProcess.CloseMainWindow();
-                    serverProcess.WaitForExit(5000); // Wait up to 5 seconds
+                    serverProcess.WaitForExit(5000);
 
                     if (!serverProcess.HasExited)
                     {
@@ -276,9 +270,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             }
         }
 
-        /// <summary>
-        /// Clears the current logs.
-        /// </summary>
         public void ClearLogs()
         {
             logBuilder.Clear();
@@ -286,9 +277,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             UnityEngine.Debug.Log("Logs have been cleared.");
         }
 
-        /// <summary>
-        /// Finds an available port on the local machine.
-        /// </summary>
         public static int FindAvailablePort()
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -298,14 +286,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             return port;
         }
 
-        /// <summary>
-        /// Cleans up the server process when the application quits.
-        /// </summary>
-        public  void Cleanup()
+        public void Cleanup()
         {
             if (IsRunning)
             {
-                StopServer();
+                StopProxyServer();
             }
         }
     }

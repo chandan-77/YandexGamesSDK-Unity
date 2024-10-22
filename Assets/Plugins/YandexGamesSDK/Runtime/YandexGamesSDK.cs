@@ -4,6 +4,7 @@ using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.LocalStorage;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types;
@@ -36,20 +37,24 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         }
 
         [DllImport("__Internal")]
-        private static extern void OnYandexGamesSDKReady();
+        private static extern void GetServerTime(string requestId);
 
         [DllImport("__Internal")]
-        private static extern void GetServerTime();
+        private static extern void GetEnvironment(string requestId);
 
         [DllImport("__Internal")]
-        private static extern void GetEnvironment();
+        private static extern void SetGameplayReady(string requestId);
 
-        private Action<bool, DateTime> getServerTimeCallback;
-        private Action<bool, EnvironmentData> getEnvironmetCallback;
+        [DllImport("__Internal")]
+        private static extern void SetGameplayStart(string requestId);
+
+        [DllImport("__Internal")]
+        private static extern void SetGameplayStop(string requestId);
 
 
         public IAuthenticationModule Authentication { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
+        public ILocalStorageModule LocalStorage { get; private set; }
         public ILeaderboardModule Leaderboard { get; private set; }
         public IAdvertisementModule Advertisement { get; private set; }
 
@@ -67,92 +72,98 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
                 Destroy(gameObject);
             }
 
-#if !UNITY_EDITOR && !UNITY_EDITOR
-        OnYandexGamesSDKReady();
-#endif
-
             InitializeModules();
         }
 
-        public void GetServerTime(Action<bool, DateTime> callback)
+        public void GetServerTime(Action<bool, string, string> callback)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            getServerTimeCallback = callback;
-            GetServerTime();
+            string requestId = YGRequestManager.GenerateRequestId();
+
+            YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, data, error);
+            });
+
+            GetServerTime(requestId);
 #else
             Debug.Log("GetServerTime is only available in WebGL builds.");
-            callback(false, DateTime.MinValue);
+            callback?.Invoke(false, null, "GetServerTime is only available in WebGL builds.");
 #endif
         }
 
-        public void GetEnvironment(Action<bool, EnvironmentData> callback)
+        public void GetEnvironment(Action<bool, EnvironmentData, string> callback)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            getEnvironmetCallback = callback;
-            GetEnvironment();
+            string requestId = YGRequestManager.GenerateRequestId();
+
+            YGRequestManager.RegisterCallback<EnvironmentData>(requestId, (success, data, error) =>
+            {
+                callback?.Invoke(success, data, error);
+            });
+
+            GetEnvironment(requestId);
 #else
             Debug.Log("GetEnvironment is only available in WebGL builds.");
-            callback(false, default);
+            callback?.Invoke(false, null, "GetEnvironment is only available in WebGL builds.");
 #endif
         }
 
-        public void OnGetServerTimeSuccess(string serverTime)
+        public void SetGameplayReady(Action<bool, string> callback = null)
         {
-            Debug.Log($"Server Time Retrieved: {serverTime}");
+#if UNITY_WEBGL && !UNITY_EDITOR
+            string requestId = YGRequestManager.GenerateRequestId();
 
-            if (long.TryParse(serverTime, out long serverTimeMillis))
+            YGRequestManager.RegisterCallback<object>(requestId, (success, data, error) =>
             {
-                DateTime serverDateTime = DateTimeOffset.FromUnixTimeMilliseconds(serverTimeMillis).UtcDateTime;
-                Debug.Log($"Parsed Server Time: {serverDateTime}");
+                callback?.Invoke(success, error);
+            });
 
-                getServerTimeCallback?.Invoke(true, serverDateTime);
-            }
-            else
-            {
-                Debug.LogError($"Failed to parse server time: {serverTime}");
-                getServerTimeCallback?.Invoke(false, DateTime.MinValue);
-            }
+            SetGameplayReady(requestId);
+#else
+            Debug.Log("SetGameplayReady is only available in WebGL builds.");
+            callback?.Invoke(false, "SetGameplayReady is only available in WebGL builds.");
+#endif
         }
 
-        public void OnGetServerTimeFailure(string error)
+        public void SetGameplayStart(Action<bool, string> callback = null)
         {
-            Debug.LogError($"Failed to get server time: {error}");
-            getServerTimeCallback?.Invoke(false, DateTime.MinValue);
-        }
+#if UNITY_WEBGL && !UNITY_EDITOR
+            string requestId = YGRequestManager.GenerateRequestId();
 
-        public void OnGetEnvironmentSuccess(string environment)
-        {
-            Debug.Log($"Environment Retrieved: {environment}");
-
-            var data = JsonUtility.FromJson<EnvironmentData>(environment);
-
-            Debug.Log($"Environment Retrieved: {JsonUtility.ToJson(data)}");
-            getEnvironmetCallback?.Invoke(true, data);
-        }
-
-        public void OnGetEnvironmentFailure(string error)
-        {
-            Debug.LogError($"Failed to get environment: {error}");
-
-            getEnvironmetCallback?.Invoke(false, default);
-        }
-
-        public void OnSDKInitialized(string message)
-        {
-            if (message == "true")
+            YGRequestManager.RegisterCallback<object>(requestId, (success, data, error) =>
             {
-                Debug.Log("Yandex SDK initialized successfully in Unity.");
-                _isInitialized = true;
-            }
-            else
+                callback?.Invoke(success, error);
+            });
+
+            SetGameplayStart(requestId);
+#else
+            Debug.Log("SetGameplayStart is only available in WebGL builds.");
+            callback?.Invoke(false, "SetGameplayStart is only available in WebGL builds.");
+#endif
+        }
+
+        public void SetGameplayStop(Action<bool, string> callback = null)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            string requestId = YGRequestManager.GenerateRequestId();
+
+            YGRequestManager.RegisterCallback<object>(requestId, (success, data, error) =>
             {
-                string errorMessage = message.StartsWith("false|") ? message.Substring(6) : "Unknown error";
-                Debug.LogError("Yandex SDK initialization failed in Unity: " + errorMessage);
-            }
+                callback?.Invoke(success, error);
+            });
+
+            SetGameplayStop(requestId);
+#else
+            Debug.Log("SetGameplayStop is only available in WebGL builds.");
+            callback?.Invoke(false, "SetGameplayStop is only available in WebGL builds.");
+#endif
         }
 
         private void InitializeModules()
         {
+            LocalStorage = LoadAndInitializeModule<PlayerPrefsLocalStorageModule>();
+
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
             Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
@@ -167,7 +178,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             return module;
         }
-        
+
         // This method will be called from JavaScript
         public void OnJSResponse(string jsonResponse)
         {

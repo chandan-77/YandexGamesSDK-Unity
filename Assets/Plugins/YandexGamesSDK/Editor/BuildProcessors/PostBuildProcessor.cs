@@ -36,7 +36,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.BuildProcessors
             {
                 if (!ProxyServerFactory.ProxyServer.IsRunning)
                 {
-                    ProxyServerFactory.ProxyServer.StartServer();
+                    ProxyServerFactory.ProxyServer.StartProxyServer();
                 }
             }
         }

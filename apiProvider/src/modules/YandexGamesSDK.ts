@@ -32,36 +32,46 @@ export class YandexGamesSDK {
         }
     }
 
-    public static async getServerTime(): Promise<void> {
+    /**
+     * Get the server time.
+     * @param {string} requestId - The unique request ID.
+     */
+    public static async getServerTime(requestId: string): Promise<void> {
         try {
-            const sdk: YandexGames.SDK = window.yandexSDK;
-            let serverTime = await sdk.serverTime();
+            const sdk: YandexGames.SDK = await window.yandexSDK;
 
-            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetServerTimeSuccess', String(serverTime));
-    
+            const serverTime = await sdk.serverTime();
+
+            // Send success response with data
+            window.SendResponseToUnity(requestId, true, String(serverTime), null);
+            console.log("Server time fetched successfully and sent to Unity.");
         } catch (error: any) {
-            console.error('Failed to get server time:', error.message || String(error));
-
-            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetServerTimeFailure', `false|${error.message || String(error)}`);
+            console.error("Failed to get server time:", error.message || error);
+            window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to get server time.');
         }
     }
-    
-    public static async getEnvironment(): Promise<void> {
-        try {
-            const sdk: YandexGames.SDK = window.yandexSDK;
-            let env = sdk.environment;  // Assuming environment is a property
-    
-            // Send success message to Unity
-            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetEnvironmentSuccess', JSON.stringify(env)
-        );
-    
-        } catch (error: any) {
-            console.error('Failed to get environment:', error.message || String(error));
 
-            window.unityInstance.SendMessage('YandexGamesSDK', 'OnGetEnvironmetFailure', `false|${error.message || String(error)}`);
+    /**
+     * Get the environment data.
+     * @param {string} requestId - The unique request ID.
+     */
+    public static async getEnvironment(requestId: string): Promise<void> {
+        try {
+            const sdk: YandexGames.SDK = await window.yandexSDK;
+
+            const env = sdk.environment;  
+
+            // Serialize environment data to JSON
+            const jsonData = JSON.stringify(env);
+
+            // Send success response with data
+            window.SendResponseToUnity(requestId, true, jsonData, null);
+            console.log("Environment data fetched successfully and sent to Unity.");
+        } catch (error: any) {
+            console.error("Failed to get environment:", error.message || error);
+            window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to get environment.');
         }
     }
-    
 
     /**
      * Loads the Yandex SDK script and initializes it.
@@ -69,8 +79,8 @@ export class YandexGamesSDK {
     private static async loadYandexSDK(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
-            // script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
-            script.src = '/sdk.js'; // Yandex SDK URL
+            script.src = 'https://yandex.ru/games/sdk/v2'; // Yandex SDK URL
+            //script.src = '/sdk.js'; // Yandex SDK URL
             script.onload = () => YandexGamesSDK.onYandexSDKLoaded().then(resolve).catch(reject);
             script.onerror = () => {
                 console.error('Failed to load Yandex SDK script');

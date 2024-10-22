@@ -41,6 +41,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 #else
             Debug.Log("Authentication is only available in WebGL builds.");
             callback?.Invoke(false, "Authentication is only available in WebGL builds.");
+            
+            
 #endif
         }
 

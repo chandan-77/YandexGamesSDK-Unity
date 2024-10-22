@@ -1,20 +1,25 @@
 using System;
 using System.Runtime.InteropServices;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
 {
-    public enum RewardedAdResponse
-    {
-        AdOpened,
-        AdGranted,
-        AdClosed
-    }
-
     public class AdvertisementModule : YGModuleBase, IAdvertisementModule
     {
+        private YGPauseSettings _pauseSettings = YandexGamesSDKConfig.Instance.pauseSettings;
+
+        public UnityEvent OnAdOpened = new UnityEvent();
+        public UnityEvent OnAdClosed = new UnityEvent();
+
+        private bool originalAudioPause;
+        private float originalTimeScale;
+        private bool originalCursorVisible;
+        private CursorLockMode originalCursorLockMode;
+
         public override void Initialize()
         {
         }
@@ -31,68 +36,196 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
         [DllImport("__Internal")]
         private static extern void HideBannerAd(string requestId);
 
-        public void ShowInterstitialAd(Action<bool, string> callback = null)
+        public void ShowInterstitialAd(Action<bool, YGAdResponse, string> callback = null)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+    #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
             YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
             {
-                callback?.Invoke(success, error);
+                if (success)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        if (Enum.TryParse<YGAdResponse>(data, out var adResponse))
+                        {
+                            if (adResponse == YGAdResponse.AdOpened)
+                                HandleAdOpened();
+                            else if (adResponse == YGAdResponse.AdClosed)
+                                HandleAdClosed();
+
+                            callback?.Invoke(true, adResponse, null);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Unknown ad response: {data}");
+                            callback?.Invoke(true, default, null);
+                        }
+                    }
+                    else
+                    {
+                        callback?.Invoke(true, default, null);
+                    }
+                }
+                else
+                {
+                    callback?.Invoke(false, default, error);
+                }
             });
 
             ShowInterstitialAd(requestId);
-#else
+    #else
             Debug.Log("Interstitial ads are only available in WebGL builds.");
-            callback?.Invoke(false, "Interstitial ads are only available in WebGL builds.");
-#endif
+            callback?.Invoke(false, default, "Interstitial ads are only available in WebGL builds.");
+    #endif
         }
 
-        public void ShowRewardedAd(Action<bool, string, string> callback = null)
+        public void ShowRewardedAd(Action<bool, YGAdResponse, string> callback = null)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+    #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
             YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
             {
-                callback?.Invoke(success, data, error);
+                if (success)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        if (Enum.TryParse<YGAdResponse>(data, out var adResponse))
+                        {
+                            if (adResponse == YGAdResponse.AdOpened)
+                                HandleAdOpened();
+                            else if (adResponse == YGAdResponse.AdClosed)
+                                HandleAdClosed();
+
+                            callback?.Invoke(true, adResponse, null);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Unknown ad response: {data}");
+                            callback?.Invoke(true, default, null);
+                        }
+                    }
+                    else
+                    {
+                        callback?.Invoke(true, default, null);
+                    }
+                }
+                else
+                {
+                    callback?.Invoke(false, default, error);
+                }
             });
 
             ShowRewardedAd(requestId);
-#else
+    #else
             Debug.Log("Rewarded ads are only available in WebGL builds.");
-            callback?.Invoke(false, null,"Rewarded ads are only available in WebGL builds.");
-#endif
+            callback?.Invoke(false, default, "Rewarded ads are only available in WebGL builds.");
+    #endif
         }
 
-        public void ShowBannerAd(string position, Action<bool, string> callback = null)
+        public void ShowBannerAd(string position, Action<bool, YGAdResponse, string> callback = null)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+    #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
             YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
             {
-                callback?.Invoke(success, error);
+                if (success)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        if (Enum.TryParse<YGAdResponse>(data, out var adResponse))
+                        {
+                            callback?.Invoke(true, adResponse, null);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Unknown ad response: {data}");
+                            callback?.Invoke(true, default, null);
+                        }
+                    }
+                    else
+                    {
+                        callback?.Invoke(true, default, null);
+                    }
+                }
+                else
+                {
+                    callback?.Invoke(false, default, error);
+                }
             });
 
             ShowBannerAd(requestId, position);
-#else
+    #else
             Debug.Log("Banner ads are only available in WebGL builds.");
-            callback?.Invoke(false, "Banner ads are only available in WebGL builds.");
-#endif
+            callback?.Invoke(false, default, "Banner ads are only available in WebGL builds.");
+    #endif
         }
 
-        public void HideBannerAd(Action<bool, string> callback = null)
+        public void HideBannerAd(Action<bool, YGAdResponse, string> callback = null)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+    #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
             YGRequestManager.RegisterCallback<string>(requestId, (success, data, error) =>
             {
-                callback?.Invoke(success, error);
+                if (success)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        if (Enum.TryParse<YGAdResponse>(data, out var adResponse))
+                        {
+                            callback?.Invoke(true, adResponse, null);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Unknown ad response: {data}");
+                            callback?.Invoke(true, default, null);
+                        }
+                    }
+                    else
+                    {
+                        callback?.Invoke(true, default, null);
+                    }
+                }
+                else
+                {
+                    callback?.Invoke(false, default, error);
+                }
             });
 
             HideBannerAd(requestId);
-#else
+    #else
             Debug.Log("Banner ads are only available in WebGL builds.");
-            callback?.Invoke(false, "Banner ads are only available in WebGL builds.");
-#endif
+            callback?.Invoke(false, default, "Banner ads are only available in WebGL builds.");
+    #endif
+        }
+
+        private void HandleAdOpened()
+        {
+            originalAudioPause = AudioListener.pause;
+            originalTimeScale = Time.timeScale;
+            originalCursorVisible = Cursor.visible;
+            originalCursorLockMode = Cursor.lockState;
+
+            if (_pauseSettings.pauseAudio)
+                AudioListener.pause = true;
+            if (_pauseSettings.pauseTime)
+                Time.timeScale = 0f;
+            if (_pauseSettings.hideCursor)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = _pauseSettings.cursorLockMode;
+            }
+
+            OnAdOpened?.Invoke();
+        }
+
+        private void HandleAdClosed()
+        {
+            AudioListener.pause = originalAudioPause;
+            Time.timeScale = originalTimeScale;
+            Cursor.visible = originalCursorVisible;
+            Cursor.lockState = originalCursorLockMode;
+
+            OnAdClosed?.Invoke();
         }
     }
 }

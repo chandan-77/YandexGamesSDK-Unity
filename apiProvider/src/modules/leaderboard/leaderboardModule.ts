@@ -8,7 +8,7 @@ export class LeaderboardModule {
      * @param {number} score - The score to submit.
      * @param {string} [extraData] - Optional user description.
      */
-    static async submitScore(requestId:string, leaderboardName:string, score:number, extraData = null) {
+    static async submitScore(requestId: string, leaderboardName: string, score: number, extraData = null) {
         try {
             const sdk = await window.yandexSDK;
             const leaderboards = await sdk.getLeaderboards();
@@ -23,7 +23,7 @@ export class LeaderboardModule {
             // Send success response
             window.SendResponseToUnity(requestId, true, null, null);
             console.log("Score submitted successfully to Unity.");
-        } catch (error:any) {
+        } catch (error: any) {
             // Enhanced error handling
             console.error("Error submitting score:", error.message || error);
             window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to submit score.');
@@ -38,7 +38,7 @@ export class LeaderboardModule {
      * @param {number} quantityAround - Number of entries around the player.
      * @param {boolean} includeUser - Whether to include the user's entry.
      */
-    static async getLeaderboardEntries(requestId:string, leaderboardName:string, quantityTop = 5, quantityAround = 5, includeUser = true) {
+    static async getLeaderboardEntries(requestId: string, leaderboardName: string, quantityTop = 5, quantityAround = 5, includeUser = true) {
         try {
             const sdk = await window.yandexSDK;
             const leaderboards = await sdk.getLeaderboards();
@@ -60,7 +60,7 @@ export class LeaderboardModule {
             // Send success response with data
             window.SendResponseToUnity(requestId, true, jsonData, null);
             console.log("Leaderboard entries fetched successfully and sent to Unity.");
-        } catch (error:any) {
+        } catch (error: any) {
             console.error("Error fetching leaderboard entries:", error.message || error);
             window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to fetch leaderboard entries.');
         }
@@ -71,7 +71,7 @@ export class LeaderboardModule {
      * @param {string} requestId - The unique request ID.
      * @param {string} leaderboardName - The name of the leaderboard.
      */
-    static async getPlayerEntry(requestId:string, leaderboardName:string) {
+    static async getPlayerEntry(requestId: string, leaderboardName: string) {
         try {
             const sdk = await window.yandexSDK;
             const leaderboards = await sdk.getLeaderboards();
@@ -88,7 +88,7 @@ export class LeaderboardModule {
             // Send success response with data
             window.SendResponseToUnity(requestId, true, jsonData, null);
             console.log("Player entry fetched successfully and sent to Unity.");
-        } catch (error:any) {
+        } catch (error: any) {
             console.error("Error fetching player entry:", error.message || error);
             window.SendResponseToUnity(requestId, false, null, error.message || 'Failed to fetch player entry.');
         }
