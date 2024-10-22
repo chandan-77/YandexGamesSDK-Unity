@@ -25,6 +25,11 @@ MonoBehaviour:
       avatarUrlMedium: 
       avatarUrlLarge: 
     mockLeaderboardEntries: []
+  pauseSettings:
+    pauseAudio: 1
+    pauseTime: 1
+    hideCursor: 1
+    cursorLockMode: 2
   developmentSettings:
     runLocalServerAfterBuild: 0
     overrideOnBuild: 0

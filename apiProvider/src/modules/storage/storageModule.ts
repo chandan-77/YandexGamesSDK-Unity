@@ -1,9 +1,11 @@
+import { YandexGames } from "YandexGamesSDK";
+
 export class StorageModule {
     private static queue: Array<() => Promise<void>> = [];
     private static isProcessing: boolean = false;
 
     private static async processQueue() {
-        if (StorageModule.isProcessing || StorageModule.queue.length === 0) return;
+        if (StorageModule.isProcessing) return;
 
         StorageModule.isProcessing = true;
 
@@ -26,7 +28,8 @@ export class StorageModule {
             try {
                 console.log('savePlayerData called with:', { requestId, key, data });
 
-                const player = await window.yandexSDK.getPlayer();
+                const sdk:YandexGames.SDK = await window.yandexSDK;
+                const player = await sdk.getPlayer();
                 await player.setData({ [key]: data }, true);
 
                 console.log(`Saving data for ${key}:`, data);
@@ -46,9 +49,11 @@ export class StorageModule {
             try {
                 console.log('loadPlayerData called with:', { requestId, key });
 
-                const player = await window.yandexSDK.getPlayer();
+                const sdk:YandexGames.SDK = await window.yandexSDK;
+                const player = await sdk.getPlayer();
                 const result = await player.getData([key]);
 
+                console.log("Data Load Result = ", result);
                 if (result && result.hasOwnProperty(key)) {
                     const data = result[key];
                     console.log(`Loaded player data for key ${key}:`, data);
@@ -60,7 +65,6 @@ export class StorageModule {
                 }
             } catch (error: any) {
                 console.error("Failed to load player data:", error.message);
-
                 window.SendResponseToUnity(requestId, false, null, error.message);
             }
         });

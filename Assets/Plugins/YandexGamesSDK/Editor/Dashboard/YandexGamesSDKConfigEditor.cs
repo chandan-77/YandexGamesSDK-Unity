@@ -11,6 +11,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
         private SerializedProperty useMockDataProp;
         private SerializedProperty mockDataProp;
         private SerializedProperty developmentSettingsProp;
+        private SerializedProperty pauseSettings;
 
         private void OnEnable()
         {
@@ -19,6 +20,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             useMockDataProp = serializedObject.FindProperty("useMockData");
             mockDataProp = serializedObject.FindProperty("mockData");
             developmentSettingsProp = serializedObject.FindProperty("developmentSettings");
+            pauseSettings = serializedObject.FindProperty("pauseSettings");
         }
 
         public override void OnInspectorGUI()
@@ -38,6 +40,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 EditorGUILayout.PropertyField(mockDataProp, true);
             }
 
+            EditorGUILayout.Space();
+            
+            EditorGUILayout.LabelField("Pause Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(pauseSettings, true);
+            
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);

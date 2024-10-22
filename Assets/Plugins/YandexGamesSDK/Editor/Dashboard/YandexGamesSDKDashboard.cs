@@ -92,6 +92,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
 
             EditorGUILayout.Space();
 
+            // Pause Settings
+              
+            EditorGUILayout.LabelField("Pause Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedConfig.FindProperty("pauseSettings"), true);
+            
+            EditorGUILayout.Space();
+
             // Development Settings
             EditorGUILayout.LabelField("Development Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedConfig.FindProperty("developmentSettings"), true);

@@ -49,19 +49,19 @@ var key = UTF8ToString(keyPtr);
     }
   },
 
-  GetServerTime: function() {
+  GetServerTime: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.GetServerTime === 'function') {
-      
-      window.YandexSDKExports.GetServerTime();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.GetServerTime(requestId);
     } else {
       console.error('GetServerTime is not defined on window.YandexSDKExports.');
     }
   },
 
-  GetEnvironment: function() {
+  GetEnvironment: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.GetEnvironment === 'function') {
-      
-      window.YandexSDKExports.GetEnvironment();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.GetEnvironment(requestId);
     } else {
       console.error('GetEnvironment is not defined on window.YandexSDKExports.');
     }
@@ -102,28 +102,28 @@ var leaderboardName = UTF8ToString(leaderboardNamePtr);
     }
   },
 
-  SetGameplayReady: function() {
+  SetGameplayReady: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.SetGameplayReady === 'function') {
-      
-      window.YandexSDKExports.SetGameplayReady();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.SetGameplayReady(requestId);
     } else {
       console.error('SetGameplayReady is not defined on window.YandexSDKExports.');
     }
   },
 
-  SetGameplayStart: function() {
+  SetGameplayStart: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.SetGameplayStart === 'function') {
-      
-      window.YandexSDKExports.SetGameplayStart();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.SetGameplayStart(requestId);
     } else {
       console.error('SetGameplayStart is not defined on window.YandexSDKExports.');
     }
   },
 
-  SetGameplayStop: function() {
+  SetGameplayStop: function(requestIdPtr) {
     if (typeof window.YandexSDKExports.SetGameplayStop === 'function') {
-      
-      window.YandexSDKExports.SetGameplayStop();
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.SetGameplayStop(requestId);
     } else {
       console.error('SetGameplayStop is not defined on window.YandexSDKExports.');
     }

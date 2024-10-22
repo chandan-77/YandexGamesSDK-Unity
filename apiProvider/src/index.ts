@@ -20,20 +20,32 @@ window.SendResponseToUnity = function SendResponseToUnity(requestId: string, sta
 
 
 window.YandexSDKExports = {
+  // Authentication
   AuthenticateUser: AuthModule.authenticateUser,
+
+  // Storage
   SavePlayerData: StorageModule.savePlayerData,
   LoadPlayerData: StorageModule.loadPlayerData,
+
+  // Initialization Checks
   CheckForInitialization: YandexGamesSDK.checkForInitialization,
   OnYandexGamesSDKReady: YandexGamesSDK.OnYandexGamesSDKReady,
+
+  // Server Time and Environment
   GetServerTime: YandexGamesSDK.getServerTime,
   GetEnvironment: YandexGamesSDK.getEnvironment,
+
+  // Leaderboards
   SubmitScore: LeaderboardModule.submitScore,
   GetLeaderboardEntries: LeaderboardModule.getLeaderboardEntries,
   GetPlayerEntry: LeaderboardModule.getPlayerEntry,
+
+  // Gameplay Markup
   SetGameplayReady: GameplayModule.setGameplayReady,
   SetGameplayStart: GameplayModule.setGameplayStart,
   SetGameplayStop: GameplayModule.setGameplayStop,
 
+  // Advertisements
   HideBannerAd: AdvertisementModule.hideBannerAd,
   ShowBannerAd: AdvertisementModule.showBannerAd,
   ShowInterstitialAd: AdvertisementModule.showInterstitialAd,

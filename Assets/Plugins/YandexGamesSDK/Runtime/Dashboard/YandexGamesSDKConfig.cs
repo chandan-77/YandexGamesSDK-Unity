@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Singletons;
 using UnityEngine;
 
@@ -51,6 +52,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
         public bool useMockData = true;
         [Header("Mock Settings")] public MockDataSettings mockData;
 
+        [Header("Advertisement Settings")]
+        public YGPauseSettings pauseSettings;
+        
         [Header("Development Settings")] public DevelopmentSettings developmentSettings;
 
         public void SetServerConfiguration(string buildPath, int serverPort)
