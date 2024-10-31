@@ -1,41 +1,14 @@
 # YandexGamesSDK-Unity
 
+[![Documentation](https://img.shields.io/badge/documentation-website-blue)](https://yandex-games-docs.playables.studio/)
+
+## Documentation
+
+For detailed documentation, tutorials, and integration guides, please visit our [documentation website](https://yandex-games-docs.playables.studio/).
+
 ## Overview
 
-YandexGamesSDK-Unity is an advanced integration package designed for Unity developers to seamlessly connect their WebGL projects with Yandex Games services. This comprehensive plugin enhances your development workflow by providing robust authentication, leaderboard management, advertisement integration, cloud storage functionality, and a built-in local server management utility for efficient testing and development.
-
-## Key Features
-
-### Authentication and User Profiles
-- Manage Yandex Games authentication directly from Unity
-- Handle both anonymous and registered users
-- Access player profiles and avatar data
-- Support for mock profiles in local environments
-
-### Leaderboard Management
-- Submit and retrieve scores
-- Get player-specific leaderboard data
-- Efficient leaderboard data handling with dedicated classes
-
-### Advertisements Integration
-- Implement fullscreen ads and rewarded videos
-- Customizable callback functions for ad lifecycle events (open, close, error, reward completion)
-
-### Cloud and Local Storage
-- Securely save and load player data using Yandex Cloud Storage
-- Automatic fallback to local storage for testing during development
-
-### Local Server Development
-- Run a local server for development and testing
-- Simulate a live Yandex environment
-- Automatic server start after WebGL builds
-- Real-time server logs and status monitoring
-
-### Yandex Games SDK Dashboard
-- Unity editor window for easy configuration and management
-- Create and manage configuration assets
-- Toggle development options and mock data
-- Control local server directly from Unity
+YandexGamesSDK-Unity is an advanced integration package that connects Unity WebGL projects with Yandex Games services. This repository contains the core SDK implementation and is intended for developers who want to contribute to the project or understand its technical details.
 
 ## Technical Requirements
 
@@ -43,107 +16,88 @@ YandexGamesSDK-Unity is an advanced integration package designed for Unity devel
 - Build Target: WebGL only
 - Node.js and npm (for local server setup)
 
-## Installation
+## Repository Structure
 
-You can easily add the YandexGamesSDK-Unity package to your project using Unity's Package Manager with Git URL:
+```
+Assets/
+├── Plugins/
+│   └── YandexGamesSDK/
+│       ├── Runtime/         # Core SDK implementation
+│       ├── Editor/          # Unity editor extensions
+│       └── LocalServer/     # Development server utilities
+```
 
-1. Open your Unity project
-2. Go to Window > Package Manager
-3. Click the "+" button in the top-left corner
-4. Select "Add package from git URL"
-5. Enter the following URL:
+## Development Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/playables-studio/YandexGamesSDK-Unity.git
    ```
-   https://github.com/playables-studio/YandexGamesSDK-Unity.git?path=/Assets/Plugins/YandexGamesSDK
+
+2. Open the project in Unity 2020.3 or higher
+
+3. Install Node.js dependencies for local development server:
+   ```bash
+   cd Assets/Plugins/YandexGamesSDK/LocalServer
+   npm install
    ```
-   
-6. Click "Add"
 
-Unity will now download and import the YandexGamesSDK-Unity package into your project.
+## Contributing
 
-## Setting Up the SDK
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-After installation:
+### Coding Standards
 
-1. Open the Yandex Games SDK Dashboard:
-   - Navigate to `Menu > Yandex Games SDK > Dashboard`
-2. Create a Configuration Asset:
-   - In the dashboard, click on "Create Config Asset"
-3. Configure your settings:
-   - Enter your Yandex Application ID
-   - Set up other preferences as needed
+- Follow Unity's C# coding conventions
+- Maintain XML documentation for public APIs
+- Include unit tests for new features
+- Update relevant documentation when making changes
 
-## Setting Up Local Development Server
+## Building from Source
 
-1. Open the Yandex Games SDK Dashboard in Unity
-2. Specify the WebGL build path and desired server port
-3. Click "Start Server" to launch the local development environment
+1. Open the project in Unity
+2. Set build target to WebGL
+3. Build the project using Unity's standard build process
 
-## Development Workflow
+## Testing
 
-1. Configure mock data (user profiles, leaderboard entries) via the SDK Dashboard
-2. Develop your game using the SDK's features
-3. Build your WebGL project
-4. Use the LocalServerManager to automatically run a server after the build
-5. Test your game in a web browser, simulating the Yandex Games environment
-
-## Key Components
-
-### AuthModule
-
-```csharp
-// Example: Authenticate a user
-YandexGamesSDK.Auth.Authenticate((success) => {
-    if (success) {
-        Debug.Log("User authenticated successfully");
-    }
-});
-```
-
-### LeaderboardModule
-
-```csharp
-// Example: Submit a score
-YandexGamesSDK.Leaderboards.SubmitScore("leaderboardName", score, (success) => {
-    if (success) {
-        Debug.Log("Score submitted successfully");
-    }
-});
-```
-
-### AdvertisementModule
-
-```csharp
-// Example: Show a fullscreen ad
-YandexGamesSDK.Ads.ShowFullscreenAd((result) => {
-    if (result == AdResult.Closed) {
-        Debug.Log("Ad closed by user");
-    }
-});
-```
-
-### StorageModule
-
-```csharp
-// Example: Save data to cloud/local storage
-YandexGamesSDK.Storage.Save("key", "value", (success) => {
-    if (success) {
-        Debug.Log("Data saved successfully");
-    }
-});
-```
-
-## Troubleshooting
-
-- **Package Not Found**: Ensure you've entered the correct Git URL in the Package Manager.
-- **Node.js/npm Not Found**: Ensure Node.js is correctly installed and added to the system PATH.
-- **Server Not Starting**: Verify build path and server port settings in YandexGamesSDKConfig.
-- **Advertisements or Leaderboard Issues**: Check Yandex App ID and enable verbose logging for detailed console messages.
-- **Permission Errors**: Ensure system permissions allow executing Node.js processes.
+- Unit tests are located in the `Tests` folder
+- Run tests through Unity Test Runner
+- Use the LocalServerManager for integration testing
 
 ## License
 
-YandexGamesSDK-Unity is distributed under the MIT License. See the LICENSE file for more information.
+YandexGamesSDK-Unity is distributed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
 ## Support
 
-For additional help, check our documentation or open an issue on our GitHub repository.
+- For SDK usage questions, refer to our [documentation](https://yandex-games-docs.playables.studio/)
+- For bugs and feature requests, open an issue
+- For contribution questions, start a discussion
+
+## Core Modules Reference
+
+For developers working with the source code:
+
+### AuthModule
+Handles user authentication and session management.
+
+### LeaderboardModule
+Manages leaderboard submissions and retrievals.
+
+### AdvertisementModule
+Controls advertisement display and lifecycle events.
+
+### StorageModule
+Handles cloud and local storage operations.
+
+## Troubleshooting Development Issues
+
+- **Package Not Found**: Verify Git submodules are initialized
+- **Node.js/npm Not Found**: Check system PATH configuration
+- **Server Not Starting**: Check port availability and permissions
+- **Build Errors**: Ensure Unity version compatibility
