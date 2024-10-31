@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        YandexGamesSDK.Instance.CloudStorage.Save<string>("salam", "ssaogooooaosa")
+        YandexGamesSDK.Instance.CloudStorage.Save<PlayerData>("salam", new PlayerData())
         ;
         YandexGamesSDK.Instance.Authentication.AuthenticateUser(requireSignin: true, (success, message) =>
         {

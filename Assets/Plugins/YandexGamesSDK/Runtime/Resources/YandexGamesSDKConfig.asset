@@ -34,4 +34,4 @@ MonoBehaviour:
     runLocalServerAfterBuild: 0
     overrideOnBuild: 0
     buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
-    serverPort: 53534
+    serverPort: 8080
