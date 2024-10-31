@@ -38,7 +38,7 @@ Assets/
 
 3. Install Node.js dependencies for local development server:
    ```bash
-   cd Assets/Plugins/YandexGamesSDK/LocalServer
+   cd ./apiProvider
    npm install
    ```
 
@@ -97,7 +97,7 @@ Handles cloud and local storage operations.
 
 ## Troubleshooting Development Issues
 
-- **Package Not Found**: Verify Git submodules are initialized
+- **Package Not Found**: Verify submodules are initialized
 - **Node.js/npm Not Found**: Check system PATH configuration
 - **Server Not Starting**: Check port availability and permissions
 - **Build Errors**: Ensure Unity version compatibility
