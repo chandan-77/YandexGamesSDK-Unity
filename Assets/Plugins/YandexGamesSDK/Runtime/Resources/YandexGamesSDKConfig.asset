@@ -31,7 +31,7 @@ MonoBehaviour:
     hideCursor: 1
     cursorLockMode: 2
   developmentSettings:
-    runLocalServerAfterBuild: 0
-    overrideOnBuild: 0
+    runLocalServerAfterBuild: 1
+    overrideOnBuild: 1
     buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
-    serverPort: 8080
+    serverPort: 8082

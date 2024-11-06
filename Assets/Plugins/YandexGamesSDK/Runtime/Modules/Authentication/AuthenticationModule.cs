@@ -9,16 +9,17 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication
 {
     public class AuthenticationModule : YGModuleBase, IAuthenticationModule
     {
-        public UserProfile CurrentUser { get; private set; }
+        public UserProfile CurrentUser { get; protected set; }
 
         [DllImport("__Internal")]
         private static extern void AuthenticateUser(string requestId, bool requireSignin);
 
-        public override void Initialize()
+        public  override void Initialize()
         {
+            
         }
 
-        public void AuthenticateUser(bool requireSignin, Action<bool, string> callback = null)
+        public virtual void AuthenticateUser(bool requireSignin, Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();

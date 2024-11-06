@@ -12,14 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c716127bc3ef445392dd9d0465bfe08f, type: 3}
   m_Name: YandexGamesSDKConfig
   m_EditorClassIdentifier: 
-  useMockData: 1
+  appID: 376093
   isYandexPlatform: 0
   verboseLogging: 1
-  mockUserProfile:
-    id: 
-    name: 
-    isAuthorized: 0
-    avatarUrlSmall: 
-    avatarUrlMedium: 
-    avatarUrlLarge: 
-  mockLeaderboardEntries: []
+  useMockData: 1
+  mockData:
+    mockUserProfile:
+      id: 
+      name: 
+      isAuthorized: 0
+      avatarUrlSmall: 
+      avatarUrlMedium: 
+      avatarUrlLarge: 
+    mockLeaderboardEntries: []
+  pauseSettings:
+    pauseAudio: 1
+    pauseTime: 1
+    hideCursor: 1
+    cursorLockMode: 2
+  developmentSettings:
+    runLocalServerAfterBuild: 0
+    overrideOnBuild: 0
+    buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
+    serverPort: 8080

@@ -43,8 +43,6 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        YandexGamesSDK.Instance.CloudStorage.Save<PlayerData>("salam", new PlayerData())
-        ;
         YandexGamesSDK.Instance.Authentication.AuthenticateUser(requireSignin: true, (success, message) =>
         {
             if (!success)
@@ -56,6 +54,10 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"Authenticated user: {YandexGamesSDK.Instance.Authentication.GetUserProfile().name}");
             }
         });
+        
+        YandexGamesSDK.Instance.CloudStorage.Save<PlayerData>("salam", new PlayerData())
+        ;
+      
 
         YandexGamesSDK.Instance.GetServerTime((isFetched, time, error) => { Debug.Log("GetServerTime: " + time); });
 

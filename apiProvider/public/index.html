@@ -102,13 +102,16 @@
         </div>
     </div>
     <div id="unity-fullscreen-button"></div>
-
-    <script>
-        if (window.YandexSDKVersion !== '<%= sdkVersion %>') {
-            console.warn('Yandex SDK version mismatch!');
-        }
-    </script>
-
 </body>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.YandexSDKVersion !== '<%= sdkVersion %>') {
+            console.warn('Yandex SDK version mismatch! %cClick here for more information', 'color: blue; text-decoration: underline;', 'https://yandex-games-docs.playables.studio/troubleshooting/sdk-version-mismatch');
+        }
+    });
+</script>
+
+
 
 </html>

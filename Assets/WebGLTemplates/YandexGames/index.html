@@ -1,5 +1,5 @@
 <!-- Yandex Games SDK for Unity - index.html Template -->
-<!-- SDK Version: 1.1.4-beta -->
+<!-- SDK Version: 1.1.5-beta -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -102,13 +102,18 @@
         </div>
     </div>
     <div id="unity-fullscreen-button"></div>
-
-    <script>
-        if (window.YandexSDKVersion !== '1.1.4-beta') {
-            console.warn('Yandex SDK version mismatch!');
-        }
-    </script>
-
 <script defer src="__sdk.js"></script></body>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.YandexSDKVersion !== '1.1.5-beta') {
+            console.warn('Yandex SDK version mismatch! %cClick here for more information', 'color: blue; text-decoration: underline;', 'https://yandex-games-docs.playables.studio/troubleshooting/sdk-version-mismatch');
+        }
+    });
+</script>
+
+
+
+
 
 </html>

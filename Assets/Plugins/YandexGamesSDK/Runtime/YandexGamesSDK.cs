@@ -162,12 +162,20 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
         private void InitializeModules()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
             LocalStorage = LoadAndInitializeModule<PlayerPrefsLocalStorageModule>();
-
             Authentication = LoadAndInitializeModule<AuthenticationModule>();
             Advertisement = LoadAndInitializeModule<AdvertisementModule>();
             Leaderboard = LoadAndInitializeModule<LeaderboardModule>();
             CloudStorage = LoadAndInitializeModule<CloudStorageModule>();
+#elif UNITY_EDITOR
+            Authentication = LoadAndInitializeModule<MockAuthenticationModule>();
+            Leaderboard = LoadAndInitializeModule<MockLeaderboardModule>();
+            CloudStorage = LoadAndInitializeModule<MockCloudStorageModule>();
+            Advertisement = LoadAndInitializeModule<MockAdvertisementModule>();
+
+            Debug.Log("Modules initialized with mock data settings in editor.");
+#endif
         }
 
         private TModule LoadAndInitializeModule<TModule>() where TModule : YGModuleBase
