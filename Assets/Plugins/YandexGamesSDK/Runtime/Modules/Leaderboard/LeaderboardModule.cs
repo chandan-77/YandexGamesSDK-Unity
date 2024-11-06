@@ -24,7 +24,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
         {
         }
 
-        public void SubmitScore(string leaderboardName, int score, string extraData = null, Action<bool, string> callback = null)
+        public virtual void SubmitScore(string leaderboardName, int score, string extraData = null, Action<bool, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -55,7 +55,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
         /// <param name="quantityAround">Number of entries around the player.</param>
         /// <param name="includeUser">Whether to include the user's entry.</param>
         /// <param name="callback">Callback invoked upon completion with leaderboard data.</param>
-        public void GetLeaderboardEntries(string leaderboardName, int quantityTop, int quantityAround, bool includeUser, Action<LeaderboardEntriesResponse, string> callback = null)
+        public virtual void GetLeaderboardEntries(string leaderboardName, int quantityTop, int quantityAround, bool includeUser, Action<LeaderboardEntriesResponse, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -87,7 +87,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Leaderboard
 #endif
         }
 
-        public void GetPlayerEntry(string leaderboardName, Action<LeaderboardEntry, string> callback = null)
+        public virtual void GetPlayerEntry(string leaderboardName, Action<LeaderboardEntry, string> callback = null)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();

@@ -11,12 +11,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
 {
     public class CloudStorageModule : YGModuleBase, ICloudStorageModule
     {
-        private Dictionary<string, string> dataCache = new Dictionary<string, string>();
-        private readonly object cacheLock = new object();
-        private Dictionary<string, long> dataVersions = new Dictionary<string, long>();
-        private bool isDirty = false;
+        protected Dictionary<string, string> dataCache = new Dictionary<string, string>();
+        protected readonly object cacheLock = new object();
+        protected Dictionary<string, long> dataVersions = new Dictionary<string, long>();
+        protected bool isDirty = false;
 
-        private ILocalStorageModule localStorage;
+        protected ILocalStorageModule localStorage;
 
         private const string DataCacheKey = "CloudStorage_DataCache";
         private const string DataVersionsKey = "CloudStorage_DataVersions";
@@ -42,7 +42,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             });
         }
 
-        public void Save<T>(string key, T data, Action<bool, string> callback = null)
+        public virtual void Save<T>(string key, T data, Action<bool, string> callback = null)
         {
             try
             {
@@ -67,12 +67,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             }
         }
 
-        public void Save(string key, object data, Action<bool, string> callback = null)
+        public virtual void Save(string key, object data, Action<bool, string> callback = null)
         {
             Save<object>(key, data, callback);
         }
 
-        public void Load<T>(string key, Action<bool, T, string> callback = null)
+        public virtual void Load<T>(string key, Action<bool, T, string> callback = null)
         {
             lock (cacheLock)
             {
@@ -97,12 +97,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             LoadDataFromBackend<T>(key, callback);
         }
 
-        public void Load(string key, Action<bool, object, string> callback = null)
+        public virtual void Load(string key, Action<bool, object, string> callback = null)
         {
             Load<object>(key, callback);
         }
 
-        public void FlushData(Action<bool, string> callback = null)
+        public virtual void FlushData(Action<bool, string> callback = null)
         {
             if (!isDirty)
             {
@@ -149,7 +149,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             });
         }
 
-        private void SaveToBackend(Dictionary<string, VersionedData> data, Action<bool, string> callback)
+        private  void SaveToBackend(Dictionary<string, VersionedData> data, Action<bool, string> callback)
         {
             string requestId = YGRequestManager.GenerateRequestId();
 

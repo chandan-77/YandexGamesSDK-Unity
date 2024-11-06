@@ -36,7 +36,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
         [DllImport("__Internal")]
         private static extern void HideBannerAd(string requestId);
 
-        public void ShowInterstitialAd(Action<bool, YGAdResponse, string> callback = null)
+        public virtual void ShowInterstitialAd(Action<bool, YGAdResponse, string> callback = null)
         {
     #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -79,7 +79,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
     #endif
         }
 
-        public void ShowRewardedAd(Action<bool, YGAdResponse, string> callback = null)
+        public virtual void ShowRewardedAd(Action<bool, YGAdResponse, string> callback = null)
         {
     #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -122,7 +122,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
     #endif
         }
 
-        public void ShowBannerAd(string position, Action<bool, YGAdResponse, string> callback = null)
+        public virtual void ShowBannerAd(string position, Action<bool, YGAdResponse, string> callback = null)
         {
     #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -160,7 +160,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
     #endif
         }
 
-        public void HideBannerAd(Action<bool, YGAdResponse, string> callback = null)
+        public virtual void HideBannerAd(Action<bool, YGAdResponse, string> callback = null)
         {
     #if UNITY_WEBGL && !UNITY_EDITOR
             string requestId = YGRequestManager.GenerateRequestId();
@@ -198,7 +198,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
     #endif
         }
 
-        private void HandleAdOpened()
+        protected virtual void HandleAdOpened()
         {
             originalAudioPause = AudioListener.pause;
             originalTimeScale = Time.timeScale;
@@ -218,7 +218,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement
             OnAdOpened?.Invoke();
         }
 
-        private void HandleAdClosed()
+        protected virtual void HandleAdClosed()
         {
             AudioListener.pause = originalAudioPause;
             Time.timeScale = originalTimeScale;

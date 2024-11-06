@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard;
 using UnityEngine;
-using UnityEditor; // Add this namespace
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 {
@@ -28,24 +27,23 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
         public event Action OnLogUpdate;
         public bool IsRunning { get; private set; }
 
-        // DllImport to call the Go-based server functions
-        [DllImport("dev_proxy", EntryPoint = "StartServer")]
-        public static extern void StartServer(string host, string path, string appID, bool csp, int port, string tld, bool logReq);
+        [DllImport("libdev_proxy")]
+        public static extern void StartServer(string path, bool csp, int port, bool logReq);
 
-        [DllImport("dev_proxy", EntryPoint = "StopServer")]
+        [DllImport("libdev_proxy")]
         public static extern void StopServer();
 
-        [DllImport("dev_proxy", EntryPoint = "GetLogs")]
+        [DllImport("libdev_proxy")]
         public static extern IntPtr GetLogs();
 
         private Task serverTask;
 
-        // Method to start the proxy server with logging and error handling
+        // Method to start the server with logging and error handling
         public void StartProxyServer()
         {
             if (IsRunning)
             {
-                logBuilder.AppendLine("Proxy server is already running.");
+                logBuilder.AppendLine("Server is already running.");
                 OnLogUpdate?.Invoke();
                 return;
             }
@@ -56,8 +54,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             {
                 serverTask = Task.Run(() =>
                 {
-                    StartServer("", _config.developmentSettings.buildPath,
-                        _config.appID, true, _config.developmentSettings.serverPort, "ru", true);
+                    try
+                    {
+                        StartServer(_config.developmentSettings.buildPath, true, _config.developmentSettings.serverPort, true);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.Message);
+                    }
                 });
 
                 IsRunning = true;
@@ -72,9 +76,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                     }
                 }, cancellationTokenSource.Token);
 
-                logBuilder.AppendLine("Proxy server started successfully.");
+                logBuilder.AppendLine("Server started successfully.");
 
-                string url = $"https://yandex.ru/games/app/{_config.appID}/?draft=true&game_url=https://localhost:{_config.developmentSettings.serverPort}";
+                string encodedGameUrl = Uri.EscapeDataString($"https://localhost:{_config.developmentSettings.serverPort}/");
+                string url = $"https://yandex.ru/games/app/{_config.appID}?draft=true&game_url={encodedGameUrl}";
                 logBuilder.AppendLine($"You can open your game with {url}");
 
                 OnLogUpdate?.Invoke();
@@ -82,11 +87,11 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 // Open the URL in the default browser
                 OpenUrlInBrowser(url);
 
-                Debug.Log("Proxy server started on a background thread.");
+                Debug.Log("Server started on a background thread.");
             }
             catch (Exception ex)
             {
-                HandleError($"Failed to start the proxy server: {ex.Message}");
+                HandleError($"Failed to start the server: {ex.Message}");
             }
         }
 
@@ -117,32 +122,36 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
             }
         }
 
-        // Method to stop the proxy server with proper cleanup and logging
+        // Method to stop the server with proper cleanup and logging
         public void StopProxyServer()
         {
             if (!IsRunning)
             {
-                logBuilder.AppendLine("Proxy server is not running.");
+                logBuilder.AppendLine("Server is not running.");
                 OnLogUpdate?.Invoke();
                 return;
             }
 
             try
             {
-                cancellationTokenSource.Cancel();
+                if (!cancellationTokenSource.IsCancellationRequested)
+                {
+                    cancellationTokenSource?.Cancel();
+                }
+
                 StopServer();
                 IsRunning = false;
 
                 RetrieveLogs(); // Retrieve any remaining logs
 
-                logBuilder.AppendLine("Proxy server stopped successfully.");
+                logBuilder.AppendLine("Server stopped successfully.");
                 OnLogUpdate?.Invoke();
 
-                Debug.Log("Proxy server stopped.");
+                Debug.Log("Server stopped.");
             }
             catch (Exception ex)
             {
-                HandleError($"Failed to stop the proxy server: {ex.Message}");
+                HandleError($"Failed to stop the server: {ex.Message}");
             }
             finally
             {
@@ -160,7 +169,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
 
             logBuilder.Clear();
             OnLogUpdate?.Invoke();
-            Debug.Log("Proxy server logs cleared and cleaned up.");
+            Debug.Log("Server logs cleared and cleaned up.");
         }
 
         // Method to clear the log
