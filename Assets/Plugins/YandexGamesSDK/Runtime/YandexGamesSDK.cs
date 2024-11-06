@@ -13,7 +13,7 @@ using UnityEngine;
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 {
     [DefaultExecutionOrder(-100)]
-    public class YandexGamesSDK : MonoBehaviour
+    public sealed class YandexGamesSDK : MonoBehaviour
     {
         private static YandexGamesSDK _instance;
 

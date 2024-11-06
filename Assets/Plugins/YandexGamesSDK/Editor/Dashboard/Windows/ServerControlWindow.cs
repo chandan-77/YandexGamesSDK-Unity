@@ -100,7 +100,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard.Windows
 
             if (autoScroll)
             {
-                EditorWindow.GetWindow<YandexGamesSDKDashboard>().Repaint();
+                // EditorWindow.GetWindow<YandexGamesSDKDashboard>().Repaint();
             }
         }
 

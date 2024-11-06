@@ -44,15 +44,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
             var windowTypes = GetAllWindowTypes();
             foreach (var type in windowTypes)
             {
-                var windowInstance = Activator.CreateInstance(type) as IYandexGamesSDKWindow;
-                if (windowInstance != null)
+                if (Activator.CreateInstance(type) is IYandexGamesSDKWindow windowInstance)
                 {
                     windows.Add(windowInstance);
                 }
             }
 
-            windows = windows.OrderBy(w => w.Priority)
-                .ToList();
+            windows = windows.OrderBy(w => w.Priority).ToList();
 
             windowNames = windows.Select(w => w.WindowName).ToArray();
         }

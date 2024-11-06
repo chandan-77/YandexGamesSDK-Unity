@@ -43,7 +43,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
     }
 
     [CreateAssetMenu(fileName = "YandexGamesSDKConfig", menuName = "Yandex Games SDK/Config", order = 1)]
-    public class YandexGamesSDKConfig : ScriptableObjectSingleton<YandexGamesSDKConfig>
+    public sealed class YandexGamesSDKConfig : ScriptableObjectSingleton<YandexGamesSDKConfig>
     {
         [Header("General Settings")] public string appID = "YOUR_GAME_ID";
         public bool isYandexPlatform = false;
