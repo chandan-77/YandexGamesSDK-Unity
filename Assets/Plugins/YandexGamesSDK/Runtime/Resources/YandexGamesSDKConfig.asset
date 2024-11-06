@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c716127bc3ef445392dd9d0465bfe08f, type: 3}
   m_Name: YandexGamesSDKConfig
   m_EditorClassIdentifier: 
-  appID: 376093
+  appID: 
   isYandexPlatform: 0
   verboseLogging: 1
   useMockData: 1
@@ -33,5 +33,5 @@ MonoBehaviour:
   developmentSettings:
     runLocalServerAfterBuild: 1
     overrideOnBuild: 1
-    buildPath: /Users/turanheydarli/Documents/Projects/YandexGamesSDK/Builds/development
-    serverPort: 8082
+    buildPath: 
+    serverPort: 8080
