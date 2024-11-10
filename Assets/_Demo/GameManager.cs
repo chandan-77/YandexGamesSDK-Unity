@@ -58,7 +58,6 @@ public class GameManager : MonoBehaviour
         YandexGamesSDK.Instance.CloudStorage.Save<PlayerData>("salam", new PlayerData())
         ;
       
-
         YandexGamesSDK.Instance.GetServerTime((isFetched, time, error) => { Debug.Log("GetServerTime: " + time); });
 
         YandexGamesSDK.Instance.GetEnvironment((isFetched, env, errors) =>

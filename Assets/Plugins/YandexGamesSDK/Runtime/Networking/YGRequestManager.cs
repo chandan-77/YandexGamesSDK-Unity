@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Logging;
 using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking
@@ -27,7 +28,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking
         {
             try
             {
-                Debug.Log($"Received JS response: {jsonResponse}");
+                YGLogger.Info($"Received JS response: {jsonResponse}");
                 var responseWrapper = JsonConvert.DeserializeObject<ResponseWrapper>(jsonResponse);
 
                 if (callbackMap.TryGetValue(responseWrapper.requestId, out var callbackInfo))
@@ -60,7 +61,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking
                             }
                             else
                             {
-                                Debug.LogWarning("Callback is not of the expected type Action<bool, object, string>.");
+                                YGLogger.Warning("Callback is not of the expected type Action<bool, object, string>.");
 
                                 callback.DynamicInvoke(responseWrapper.status, data, responseWrapper.error);
                             }
@@ -74,7 +75,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking
                         }
                         else
                         {
-                            Debug.LogWarning("Callback is not of the expected type Action<bool, object, string>.");
+                            YGLogger.Warning("Callback is not of the expected type Action<bool, object, string>.");
 
                             callback.DynamicInvoke(responseWrapper.status, default, responseWrapper.error);
                         }
@@ -82,12 +83,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking
                 }
                 else
                 {
-                    Debug.LogWarning($"No callback found for requestId: {responseWrapper.requestId}");
+                    YGLogger.Warning($"No callback found for requestId: {responseWrapper.requestId}");
                 }
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error processing JS response: {ex.Message}\nStack Trace: {ex.StackTrace}");
+                YGLogger.Error($"Error processing JS response: {ex.Message}\nStack Trace: {ex.StackTrace}");
             }
         }
 

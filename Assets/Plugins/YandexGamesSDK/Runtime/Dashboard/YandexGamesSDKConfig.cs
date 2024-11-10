@@ -57,6 +57,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
         
         [Header("Development Settings")] public DevelopmentSettings developmentSettings;
 
+        private static Dictionary<string, ScriptableObject> _addonSettings = new Dictionary<string, ScriptableObject>();
+
         public void SetServerConfiguration(string buildPath, int serverPort)
         {
             if (developmentSettings.overrideOnBuild)
@@ -64,6 +66,23 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
                 developmentSettings.buildPath = buildPath;
                 developmentSettings.serverPort = serverPort;
             }
+        }
+        
+        public static void RegisterSettings(string key, ScriptableObject settings)
+        {
+            if (!_addonSettings.ContainsKey(key))
+            {
+                _addonSettings.Add(key, settings);
+            }
+        }
+
+        public static T GetSettings<T>(string key) where T : ScriptableObject
+        {
+            if (_addonSettings.TryGetValue(key, out ScriptableObject settings))
+            {
+                return settings as T;
+            }
+            return null;
         }
     }
 }

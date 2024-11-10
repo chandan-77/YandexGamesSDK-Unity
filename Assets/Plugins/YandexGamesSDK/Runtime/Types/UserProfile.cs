@@ -1,4 +1,6 @@
 using System;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Utilities;
+using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Types
 {

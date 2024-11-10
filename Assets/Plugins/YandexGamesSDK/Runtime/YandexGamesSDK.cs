@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Logging;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Authentication;
@@ -87,7 +88,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             GetServerTime(requestId);
 #else
-            Debug.Log("GetServerTime is only available in WebGL builds.");
+            YGLogger.Debug("GetServerTime is only available in WebGL builds.");
             callback?.Invoke(false, null, "GetServerTime is only available in WebGL builds.");
 #endif
         }
@@ -104,7 +105,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             GetEnvironment(requestId);
 #else
-            Debug.Log("GetEnvironment is only available in WebGL builds.");
+            YGLogger.Debug("GetEnvironment is only available in WebGL builds.");
             callback?.Invoke(false, null, "GetEnvironment is only available in WebGL builds.");
 #endif
         }
@@ -121,7 +122,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             SetGameplayReady(requestId);
 #else
-            Debug.Log("SetGameplayReady is only available in WebGL builds.");
+            YGLogger.Debug("SetGameplayReady is only available in WebGL builds.");
             callback?.Invoke(false, "SetGameplayReady is only available in WebGL builds.");
 #endif
         }
@@ -138,7 +139,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             SetGameplayStart(requestId);
 #else
-            Debug.Log("SetGameplayStart is only available in WebGL builds.");
+            YGLogger.Debug("SetGameplayStart is only available in WebGL builds.");
             callback?.Invoke(false, "SetGameplayStart is only available in WebGL builds.");
 #endif
         }
@@ -155,7 +156,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 
             SetGameplayStop(requestId);
 #else
-            Debug.Log("SetGameplayStop is only available in WebGL builds.");
+            YGLogger.Debug("SetGameplayStop is only available in WebGL builds.");
             callback?.Invoke(false, "SetGameplayStop is only available in WebGL builds.");
 #endif
         }
@@ -174,7 +175,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             CloudStorage = LoadAndInitializeModule<MockCloudStorageModule>();
             Advertisement = LoadAndInitializeModule<MockAdvertisementModule>();
 
-            Debug.Log("Modules initialized with mock data settings in editor.");
+            YGLogger.Debug("Modules initialized with mock data settings in editor.");
 #endif
         }
 
