@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Logging;
 using UnityEngine;
 
 namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
@@ -30,12 +31,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                 }
 
                 SaveToLocalStorage();
-                Debug.Log($"Mock save for key '{key}' with data: {jsonData}");
+                YGLogger.Info($"Mock save for key '{key}' with data: {jsonData}");
                 callback?.Invoke(true, null);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Mock serialization error for key '{key}': {ex.Message}");
+                YGLogger.Error($"Mock serialization error for key '{key}': {ex.Message}");
                 callback?.Invoke(false, $"Serialization error: {ex.Message}");
             }
         }
@@ -49,18 +50,18 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                     try
                     {
                         var data = JsonConvert.DeserializeObject<T>(dataCache[key]);
-                        Debug.Log($"Mock load successful for key '{key}'.");
+                        YGLogger.Info($"Mock load successful for key '{key}'.");
                         callback?.Invoke(true, data, null);
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError($"Mock deserialization error for key '{key}': {ex.Message}");
+                        YGLogger.Error($"Mock deserialization error for key '{key}': {ex.Message}");
                         callback?.Invoke(false, default(T), $"Deserialization error: {ex.Message}");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning($"Mock load failed: key '{key}' not found.");
+                    YGLogger.Warning($"Mock load failed: key '{key}' not found.");
                     callback?.Invoke(false, default(T), $"Key '{key}' not found.");
                 }
             }
@@ -71,13 +72,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             if (isDirty)
             {
                 SaveToLocalStorage();
-                Debug.Log("Mock data flushed successfully.");
+                YGLogger.Info("Mock data flushed successfully.");
                 isDirty = false;
                 callback?.Invoke(true, null);
             }
             else
             {
-                Debug.Log("No data to flush in mock.");
+                YGLogger.Info("No data to flush in mock.");
                 callback?.Invoke(true, "No data to flush.");
             }
         }
@@ -102,14 +103,16 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                 string dataCacheJson = PlayerPrefs.GetString(MockDataCacheKey);
                 string dataVersionsJson = PlayerPrefs.GetString(MockDataVersionsKey);
 
-                dataCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(dataCacheJson) ?? new Dictionary<string, string>();
-                dataVersions = JsonConvert.DeserializeObject<Dictionary<string, long>>(dataVersionsJson) ?? new Dictionary<string, long>();
+                dataCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(dataCacheJson) ??
+                            new Dictionary<string, string>();
+                dataVersions = JsonConvert.DeserializeObject<Dictionary<string, long>>(dataVersionsJson) ??
+                               new Dictionary<string, long>();
             }
             else
             {
                 dataCache = new Dictionary<string, string>();
                 dataVersions = new Dictionary<string, long>();
-                Debug.Log("No mock data found in local storage; starting with empty cache.");
+                YGLogger.Info("No mock data found in local storage; starting with empty cache.");
             }
         }
     }

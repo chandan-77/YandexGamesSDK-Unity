@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Logging;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.LocalStorage;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Networking;
@@ -31,12 +32,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             {
                 if (success)
                 {
-                    Debug.Log("Data loaded successfully during initialization.");
+                    YGLogger.Info("Data loaded successfully during initialization.");
                     isDirty = false;
                 }
                 else
                 {
-                    Debug.LogError($"Failed to load data during initialization: {error}");
+                    YGLogger.Error($"Failed to load data during initialization: {error}");
                     // Optionally handle errors
                 }
             });
@@ -62,7 +63,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Serialization error for key '{key}': {ex.Message}");
+                YGLogger.Error($"Serialization error for key '{key}': {ex.Message}");
                 callback?.Invoke(false, $"Serialization error: {ex.Message}");
             }
         }
@@ -87,9 +88,10 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError($"Deserialization error for key '{key}': {ex.Message}");
+                        YGLogger.Error($"Deserialization error for key '{key}': {ex.Message}");
                         callback?.Invoke(false, default(T), $"Deserialization error: {ex.Message}");
                     }
+
                     return;
                 }
             }
@@ -106,14 +108,14 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
         {
             if (!isDirty)
             {
-                Debug.Log("No data to flush.");
+                YGLogger.Info("No data to flush.");
                 callback?.Invoke(true, null);
                 return;
             }
 
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                Debug.LogWarning("No internet connection. Flush postponed.");
+                YGLogger.Warning("No internet connection. Flush postponed.");
                 callback?.Invoke(false, "No internet connection.");
                 return;
             }
@@ -138,18 +140,18 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                 if (success)
                 {
                     isDirty = false;
-                    Debug.Log("Data successfully flushed to backend.");
+                    YGLogger.Info("Data successfully flushed to backend.");
                     callback?.Invoke(true, null);
                 }
                 else
                 {
-                    Debug.LogError($"Failed to flush data to backend: {error}");
+                    YGLogger.Error($"Failed to flush data to backend: {error}");
                     callback?.Invoke(false, error);
                 }
             });
         }
 
-        private  void SaveToBackend(Dictionary<string, VersionedData> data, Action<bool, string> callback)
+        private void SaveToBackend(Dictionary<string, VersionedData> data, Action<bool, string> callback)
         {
             string requestId = YGRequestManager.GenerateRequestId();
 
@@ -158,12 +160,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
 
             string jsonData = JsonConvert.SerializeObject(data);
 
-    #if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
             SavePlayerData(requestId, "yg_data", jsonData);
-    #else
-            Debug.Log("Cloud storage is only available in WebGL builds.");
+#else
+            YGLogger.Info("Cloud storage is only available in WebGL builds.");
             callback?.Invoke(false, "Cloud storage is only available in WebGL builds.");
-    #endif
+#endif
         }
 
         private void LoadAllDataFromBackend(Action<bool, string> callback = null)
@@ -183,7 +185,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError($"Deserialization error: {ex.Message}");
+                        YGLogger.Error($"Deserialization error: {ex.Message}");
                         callback?.Invoke(false, $"Deserialization error: {ex.Message}");
                     }
                 }
@@ -193,12 +195,12 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Storage
                 }
             });
 
-    #if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
             LoadPlayerData(requestId, "yg_data");
-    #else
-            Debug.Log("Cloud storage is only available in WebGL builds.");
+#else
+            YGLogger.Info("Cloud storage is only available in WebGL builds.");
             callback?.Invoke(false, "Cloud storage is only available in WebGL builds.");
-    #endif
+#endif
         }
 
         private void LoadDataFromBackend<T>(string key, Action<bool, T, string> callback)
