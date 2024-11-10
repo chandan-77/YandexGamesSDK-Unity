@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Addons;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Advertisement;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Singletons;
 using UnityEngine;
@@ -52,9 +53,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
         public bool useMockData = true;
         [Header("Mock Settings")] public MockDataSettings mockData;
 
-        [Header("Advertisement Settings")]
-        public YGPauseSettings pauseSettings;
-        
+        [Header("Advertisement Settings")] public YGPauseSettings pauseSettings;
+
         [Header("Development Settings")] public DevelopmentSettings developmentSettings;
 
         private static Dictionary<string, ScriptableObject> _addonSettings = new Dictionary<string, ScriptableObject>();
@@ -67,8 +67,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
                 developmentSettings.serverPort = serverPort;
             }
         }
-        
-        public static void RegisterSettings(string key, ScriptableObject settings)
+
+        public static void RegisterSettings<T>(string key, T settings) where T : ScriptableObject, IAddonSettings
         {
             if (!_addonSettings.ContainsKey(key))
             {
@@ -76,12 +76,13 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Dashboard
             }
         }
 
-        public static T GetSettings<T>(string key) where T : ScriptableObject
+        public static T GetSettings<T>(string key) where T : ScriptableObject, IAddonSettings
         {
             if (_addonSettings.TryGetValue(key, out ScriptableObject settings))
             {
                 return settings as T;
             }
+
             return null;
         }
     }

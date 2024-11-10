@@ -66,9 +66,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard
                 var types = assembly.GetTypes()
                     .Where(t => typeof(IYandexGamesSDKWindow).IsAssignableFrom(t)
                                 && !t.IsAbstract
-                                && t.Namespace != null
-                                && t.Namespace.StartsWith(
-                                    "PlayablesStudio.Plugins.YandexGamesSDK.Editor.Dashboard.Windows"));
+                                && t.Namespace != null);
 
                 windowTypes.AddRange(types);
             }
