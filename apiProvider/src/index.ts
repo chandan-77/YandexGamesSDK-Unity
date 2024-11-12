@@ -4,6 +4,7 @@ import { StorageModule } from './modules/storage/storageModule';
 import { LeaderboardModule } from './modules/leaderboard/leaderboardModule';
 import { GameplayModule } from './modules/gameplay/gameplayModule';
 import { AdvertisementModule } from './modules/ads/advertisementModule';
+import { IAPModule } from './modules/iap/iapModule';
 
 window.YandexSDKVersion = YANDEX_SDK_VERSION;
 
@@ -50,6 +51,13 @@ window.YandexSDKExports = {
   ShowBannerAd: AdvertisementModule.showBannerAd,
   ShowInterstitialAd: AdvertisementModule.showInterstitialAd,
   ShowRewardedAd: AdvertisementModule.showRewardedAd,
+
+  // IAP
+  InitializePayments: IAPModule.initializePayments,
+  PurchaseProduct: IAPModule.purchaseProduct,
+  GetPurchases: IAPModule.getPurchases,
+  ConsumePurchase: IAPModule.consumePurchase,
+  GetCatalog: IAPModule.getCatalog,
 };
 
 

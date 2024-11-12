@@ -165,4 +165,52 @@ var position = UTF8ToString(positionPtr);
       console.error('ShowRewardedAd is not defined on window.YandexSDKExports.');
     }
   },
+
+  InitializePayments: function(requestIdPtr) {
+    if (typeof window.YandexSDKExports.InitializePayments === 'function') {
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.InitializePayments(requestId);
+    } else {
+      console.error('InitializePayments is not defined on window.YandexSDKExports.');
+    }
+  },
+
+  PurchaseProduct: function(requestIdPtr, productIdPtr, developerPayloadPtr) {
+    if (typeof window.YandexSDKExports.PurchaseProduct === 'function') {
+      var requestId = UTF8ToString(requestIdPtr);
+var productId = UTF8ToString(productIdPtr);
+var developerPayload = developerPayloadPtr;
+      window.YandexSDKExports.PurchaseProduct(requestId, productId, developerPayload);
+    } else {
+      console.error('PurchaseProduct is not defined on window.YandexSDKExports.');
+    }
+  },
+
+  GetPurchases: function(requestIdPtr) {
+    if (typeof window.YandexSDKExports.GetPurchases === 'function') {
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.GetPurchases(requestId);
+    } else {
+      console.error('GetPurchases is not defined on window.YandexSDKExports.');
+    }
+  },
+
+  ConsumePurchase: function(requestIdPtr, purchaseTokenPtr) {
+    if (typeof window.YandexSDKExports.ConsumePurchase === 'function') {
+      var requestId = UTF8ToString(requestIdPtr);
+var purchaseToken = UTF8ToString(purchaseTokenPtr);
+      window.YandexSDKExports.ConsumePurchase(requestId, purchaseToken);
+    } else {
+      console.error('ConsumePurchase is not defined on window.YandexSDKExports.');
+    }
+  },
+
+  GetCatalog: function(requestIdPtr) {
+    if (typeof window.YandexSDKExports.GetCatalog === 'function') {
+      var requestId = UTF8ToString(requestIdPtr);
+      window.YandexSDKExports.GetCatalog(requestId);
+    } else {
+      console.error('GetCatalog is not defined on window.YandexSDKExports.');
+    }
+  },
 });

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Logging;
 using PlayablesStudio.Plugins.YandexGamesSDK.Runtime.Modules.Abstractions;
@@ -52,7 +53,6 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         [DllImport("__Internal")]
         private static extern void SetGameplayStop(string requestId);
 
-
         public IAuthenticationModule Authentication { get; private set; }
         public ICloudStorageModule CloudStorage { get; private set; }
         public ILocalStorageModule LocalStorage { get; private set; }
@@ -60,6 +60,8 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         public IAdvertisementModule Advertisement { get; private set; }
 
         private bool _isInitialized = false;
+
+        private readonly Dictionary<Type, YGModuleBase> _modules = new Dictionary<Type, YGModuleBase>();
 
         private void Awake()
         {
@@ -179,9 +181,29 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
 #endif
         }
 
+        public TModule GetModule<TModule>() where TModule : YGModuleBase
+        {
+            var moduleType = typeof(TModule);
+
+            if (_modules.TryGetValue(moduleType, out var module))
+            {
+                return (TModule)module;
+            }
+
+            var registeredModule = GetComponent<TModule>()
+                                   ?? gameObject.AddComponent<TModule>();
+            _modules[moduleType] = registeredModule;
+            registeredModule.Initialize();
+
+            return registeredModule;
+        }
+
         private TModule LoadAndInitializeModule<TModule>() where TModule : YGModuleBase
         {
+            var moduleType = typeof(TModule);
+
             var module = GetComponent<TModule>() ?? gameObject.AddComponent<TModule>();
+            _modules[moduleType] = module;
 
             module.Initialize();
 

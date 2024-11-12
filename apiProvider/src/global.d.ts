@@ -18,6 +18,8 @@ interface Window {
   YandexSDKVersion: string;
   unityInstance: UnityInstance;
   SendResponseToUnity: any;
+  payments:YandexGames.Payments;
+
 }
 
 
