@@ -68,7 +68,7 @@ void FetchEnvironmentData()
     });
 }
 
-void ApplyEnvironmentSettings(EnvironmentData environmentData)
+void ApplyEnvironmentSettings(YGEnvironmentData environmentData)
 {
     // Customize game language based on player's preferred language
     if (environmentData.i18n.lang == "tr")
