@@ -19,5 +19,12 @@
     "sdk",
     "webgl"
   ],
+  "samples": [
+    {
+      "displayName": "Yandex Games Examples",
+      "description": "Contains example scenes and prefabs for Yandex Games integration",
+      "path": "Runtime/Samples/YandexGamesExamples"
+    }
+  ],
   "license": "MIT"
 } 
