@@ -176,6 +176,9 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
         [DllImport("__Internal")]
         private static extern int YandexGamesPlugin_IsRunningOnYandex();
 
+        [DllImport("__Internal")]
+        private static extern int YandexGamesPlugin_GetDeviceType();
+
         #endregion
 
         public IAuthenticationModule Authentication { get; private set; }
@@ -386,6 +389,25 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Runtime
             s_gameplayStartCallback = null;
             s_gameplayStopCallback = null;
             s_initializeCallback = null;
+        }
+
+        /// <summary>
+        /// Gets the type of device the game is running on.
+        /// </summary>
+        /// <returns>The YGDeviceType enum representing the device type.</returns>
+        public YGDeviceType GetDeviceType()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (!IsInitialized)
+            {
+                YGLogger.Error("SDK is not initialized. Call Initialize first.");
+                return YGDeviceType.Desktop; // Default or throw error
+            }
+            return (YGDeviceType)YandexGamesPlugin_GetDeviceType();
+#else
+            YGLogger.Debug("GetDeviceType is only available in WebGL builds. Returning Desktop.");
+            return YGDeviceType.Desktop; // Default for editor
+#endif
         }
     }
     

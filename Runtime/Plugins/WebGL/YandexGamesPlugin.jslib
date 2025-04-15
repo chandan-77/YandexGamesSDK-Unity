@@ -248,6 +248,30 @@ const yandexGamesPluginLibrary = {
       }
     },
     
+    getDeviceType: function() {
+      try {
+        yandexGamesPlugin.throwIfSdkNotInitialized();
+        const deviceType = yandexGamesPlugin.sdk.deviceInfo.type;
+        
+        switch (deviceType) {
+          case 'desktop':
+            return 0;
+          case 'mobile':
+            return 1;
+          case 'tablet':
+            return 2;
+          case 'tv':
+            return 3;
+          default:
+            console.error('Unexpected ysdk.deviceInfo response from Yandex. Assuming desktop. deviceType = ' + JSON.stringify(deviceType));
+            return 0; // Default to Desktop
+        }
+      } catch (error) {
+        console.error("Error getting device type:", error);
+        return 0; // Default to Desktop on error
+      }
+    },
+    
     isRunningOnYandex: function() {
       const hostname = window.location.hostname;
       return hostname.includes('yandex') || 
@@ -292,6 +316,10 @@ const yandexGamesPluginLibrary = {
   
   YandexGamesPlugin_IsInitialized: function() {
     return yandexGamesPlugin.isInitializedGetter();
+  },
+  
+  YandexGamesPlugin_GetDeviceType: function() {
+    return yandexGamesPlugin.getDeviceType();
   }
 };
 
