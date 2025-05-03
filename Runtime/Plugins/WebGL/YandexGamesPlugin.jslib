@@ -289,11 +289,11 @@ const yandexGamesPluginLibrary = {
   YandexGamesPlugin_Initialize: function(successCallbackPtr, errorCallbackPtr) {
     yandexGamesPlugin.initialize(successCallbackPtr, errorCallbackPtr);
   },
-  
+
   YandexGamesPlugin_GetEnvironment: function(successCallbackPtr, errorCallbackPtr) {
-    yandexGamesPlugin.getEnvironment(null, successCallbackPtr, errorCallbackPtr);
+    yandexGamesPlugin.getEnvironment(successCallbackPtr, errorCallbackPtr);
   },
-  
+
   YandexGamesPlugin_GetServerTime: function(successCallbackPtr, errorCallbackPtr) {
     yandexGamesPlugin.getServerTime(successCallbackPtr, errorCallbackPtr);
   },
