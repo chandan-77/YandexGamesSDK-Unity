@@ -119,7 +119,7 @@ namespace PlayablesStudio.Plugins.YandexGamesSDK.Editor.ProxyServer
                 logBuilder.AppendLine("Server started successfully.");
 
                 string encodedGameUrl = Uri.EscapeDataString($"https://localhost:{_config.developmentSettings.serverPort}/");
-                string url = $"https://yandex.ru/games/app/{_config.appID}?draft=true&game_url={encodedGameUrl}";
+                string url = $"https://yandex.ru/games/app/{_config.appID}?draft=true&debug-mode=16&game_url={encodedGameUrl}";
                 logBuilder.AppendLine($"You can open your game with {url}");
 
                 OnLogUpdate?.Invoke();
