@@ -12,11 +12,7 @@ const leaderboardApiLibrary = {
         
         // Initialize leaderboard if SDK is available but leaderboard isn't
         if (leaderboardApi.sdk && !leaderboardApi.leaderboard) {
-          leaderboardApi.sdk.getLeaderboards().then(function(lb) {
-            leaderboardApi.leaderboard = lb;
-          }).catch(function(error) {
-            console.error("Failed to initialize leaderboard API:", error);
-          });
+            leaderboardApi.leaderboard = leaderboardApi.sdk.leaderboards;
         }
       }
       
