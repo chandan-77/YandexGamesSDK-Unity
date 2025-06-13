@@ -282,21 +282,33 @@ const yandexGamesPluginLibrary = {
         const hostname = window.location.hostname;
         const referrer = document.referrer;
         const userAgent = navigator.userAgent;
+        const hash = window.location.hash;
 
         const hasYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
         const hasYandexReferrer = referrer && referrer.includes('yandex');
-        const hasYandexUA = userAgent.includes('YaGames'); // fallback for WebView or PWA
+        const hasYandexUA = userAgent.includes('YaGames'); // fallback for PWA/WebView
+        const hasYandexHashOrigin = hash && decodeURIComponent(hash).includes('origin=https://yandex.ru');
 
         const isTopLevel = window.top === window;
 
         // Return true if:
-        // - running directly on Yandex domain (not in iframe)
-        // - referrer is from Yandex (e.g. embedded iframe)
-        // - user agent indicates Yandex Games environment (last resort)
-        return (isTopLevel && hasYandexHost) || hasYandexReferrer || hasYandexUA;
+        // - running directly on Yandex domain (not iframe)
+        // - referrer is from Yandex (iframe case)
+        // - user agent suggests Yandex container (PWA/WebView)
+        // - Yandex origin passed in hash (e.g. Safari Private mode)
+        return (
+            (isTopLevel && hasYandexHost) ||
+            hasYandexReferrer ||
+            hasYandexUA ||
+            hasYandexHashOrigin
+        );
       } catch (e) {
-        // On error (e.g. cross-origin), fallback to referrer
-        return document.referrer && document.referrer.includes('yandex');
+        // Fallback: use referrer or hash
+        const hash = window.location.hash;
+        return (
+            (document.referrer && document.referrer.includes('yandex')) ||
+            (hash && decodeURIComponent(hash).includes('origin=https://yandex.ru'))
+        );
       }
     },
 
