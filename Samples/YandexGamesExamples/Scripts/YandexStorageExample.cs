@@ -50,9 +50,9 @@ public class YandexStorageExample : MonoBehaviour
             playTime = 120.5f
         };
         
-        string jsonData = JsonConvert.SerializeObject(progress);
-        
-        sdk.CloudStorage.Save(jsonData, (success, error) =>
+        var jsonData = JsonConvert.SerializeObject(progress);
+
+        sdk.CloudStorage.Save("SaveData", jsonData, (success, error) =>
         {
             if (success)
                 Debug.Log("Progress saved to cloud!");
@@ -66,7 +66,7 @@ public class YandexStorageExample : MonoBehaviour
         if (!YandexGamesInitializer.Instance.CheckSDKAvailability())
             return;
             
-        sdk.CloudStorage.Load((success, data, error) =>
+        sdk.CloudStorage.Load<string>("SaveData", (success, data, error) =>
         {
             if (success && !string.IsNullOrEmpty(data))
             {
