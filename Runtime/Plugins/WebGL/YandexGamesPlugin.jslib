@@ -277,26 +277,26 @@ const yandexGamesPluginLibrary = {
       }
     },
 
-    isRunningOnYandex: function() {
+    isRunningOnYandex: function () {
       try {
         const hostname = window.location.hostname;
+        const referrer = document.referrer;
+        const userAgent = navigator.userAgent;
 
-        // Case 1: Running as a top-level page on Yandex Games domains
-        const isTopLevelYandex =
-            window.top === window &&
-            (hostname.includes('yandex') || hostname.includes('playhop'));
+        const hasYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
+        const hasYandexReferrer = referrer && referrer.includes('yandex');
+        const hasYandexUA = userAgent.includes('YaGames'); // fallback for WebView or PWA
 
-        // Case 2: Running inside an iframe embedded from Yandex
-        const isIframeFromYandex =
-            window.top !== window &&
-            document.referrer &&
-            document.referrer.includes('yandex');
+        const isTopLevel = window.top === window;
 
-        return isTopLevelYandex || isIframeFromYandex;
+        // Return true if:
+        // - running directly on Yandex domain (not in iframe)
+        // - referrer is from Yandex (e.g. embedded iframe)
+        // - user agent indicates Yandex Games environment (last resort)
+        return (isTopLevel && hasYandexHost) || hasYandexReferrer || hasYandexUA;
       } catch (e) {
-        // Cross-origin access error — likely in iframe → fallback to referrer check
-        var referrer = document.referrer;
-        return referrer && referrer.includes('yandex') ? true : false;
+        // On error (e.g. cross-origin), fallback to referrer
+        return document.referrer && document.referrer.includes('yandex');
       }
     },
 
