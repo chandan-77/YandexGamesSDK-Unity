@@ -53,11 +53,11 @@ public class YandexAdsExample : MonoBehaviour
     {
         if (!YandexGamesInitializer.Instance.CheckSDKAvailability())
             return;
-            
-        sdk.Advertisement.ShowInterstitial((success, error) =>
+
+        sdk.Advertisement.ShowInterstitialAd((success, response, error) =>
         {
             if (success)
-                Debug.Log("Interstitial ad shown successfully!");
+                Debug.Log($"Interstitial ad shown successfully! Response: {response}");
             else
                 Debug.LogError($"Failed to show interstitial: {error}");
         });
@@ -68,11 +68,11 @@ public class YandexAdsExample : MonoBehaviour
         if (!YandexGamesInitializer.Instance.CheckSDKAvailability())
             return;
             
-        sdk.Advertisement.ShowRewarded((success, error) =>
+        sdk.Advertisement.ShowRewardedAd((success, response, error) =>
         {
             if (success)
             {
-                Debug.Log("Rewarded ad completed!");
+                Debug.Log($"Rewarded ad completed! Response: {response}");
                 GiveReward();
             }
             else

@@ -28,7 +28,7 @@ const authenticationApiLibrary = {
           signed: true
         })
           .then(function(player) {
-            var isAuthorized = player.getMode() !== 'lite';
+            var isAuthorized = player.isAuthorized();
 
             if (requireSignin && !isAuthorized) {
               return authenticationApi.sdk.auth.openAuthDialog()
@@ -48,7 +48,7 @@ const authenticationApiLibrary = {
             return player;
           })
           .then(function(player) {
-            var isAuthorized = player.getMode() !== 'lite';
+            var isAuthorized = player.isAuthorized();
             var result = {
               id: player.getUniqueID(),
               name: player.getName() || "Guest",
@@ -112,7 +112,7 @@ const authenticationApiLibrary = {
           }
 
           authenticationApi.sdk.getPlayer({ scopes: false }).then(function(player) {
-            if (player.getMode() !== 'lite') {
+            if (player.isAuthorized()) {
               authenticationApi.isAuthorized = true;
               authenticationApi.playerAccount = player;
 

@@ -58,7 +58,7 @@ public class YandexPurchaseExample : MonoBehaviour
         });
     }
     
-    private void DisplayShopItems(Product[] products)
+    private void DisplayShopItems(YGProduct[] products)
     {
         // Clear existing items
         foreach (Transform child in shopItemsContainer)
@@ -93,10 +93,10 @@ public class YandexPurchaseExample : MonoBehaviour
             {
                 if (success && response != null)
                 {
-                    SetStatus($"Purchase successful! Purchase token: {response.purchaseToken}");
+                    SetStatus($"Purchase successful! Purchase token: {response.purchasedProduct.purchaseToken}");
                     
                     // If this is a consumable item, consume it to complete the transaction
-                    ConsumeProduct(response.purchaseToken);
+                    ConsumeProduct(response.purchasedProduct.purchaseToken);
                 }
                 else
                 {
@@ -127,9 +127,9 @@ public class YandexPurchaseExample : MonoBehaviour
     {
         sdk.Purchases.GetPurchasedProducts((success, response, error) =>
         {
-            if (success && response?.purchases != null)
+            if (success && response?.purchasedProducts != null)
             {
-                foreach (var purchase in response.purchases)
+                foreach (var purchase in response.purchasedProducts)
                 {
                     Debug.Log($"Existing purchase: {purchase.productID}, Token: {purchase.purchaseToken}");
                     // Handle any unconsumed purchases

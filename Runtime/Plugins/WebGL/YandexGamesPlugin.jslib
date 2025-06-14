@@ -40,92 +40,92 @@ const yandexGamesPluginLibrary = {
       }
       yandexGamesPlugin.isInitializeCalled = true;
 
+      function postInit(sdk, reused) {
+        yandexGamesPlugin.sdk = sdk;
+        yandexGamesPlugin.isInitialized = true;
+        window.ysdk = sdk;
+
+        // Initialize other modules conditionally
+        if (typeof advertisementApi !== 'undefined' && !advertisementApi.isInitialized) {
+          advertisementApi.sdk = sdk;
+          advertisementApi.isInitialized = true;
+        }
+
+        if (typeof purchaseApi !== 'undefined' && !purchaseApi.isInitialized) {
+          purchaseApi.sdk = sdk;
+          purchaseApi.initializePayments().catch(function(error) {
+            console.error("Failed to initialize payments:", error);
+          });
+        }
+
+        if (typeof authenticationApi !== 'undefined' && !authenticationApi.isInitialized) {
+          authenticationApi.sdk = sdk;
+          authenticationApi.isInitialized = true;
+
+          sdk.getPlayer({ scopes: false }).then(function(player) {
+            authenticationApi.playerAccount = player;
+            if (player.isAuthorized()) {
+              authenticationApi.isAuthorized = true;
+            }
+          }).catch(function(error) {
+            console.error("Failed to initialize player account:", error);
+          });
+        }
+
+        if (typeof cloudStorageApi !== 'undefined' && !cloudStorageApi.isInitialized) {
+          cloudStorageApi.sdk = sdk;
+          cloudStorageApi.isInitialized = true;
+
+          if (!cloudStorageApi.playerAccount) {
+            sdk.getPlayer({ scopes: false }).then(function(player) {
+              cloudStorageApi.playerAccount = player;
+            }).catch(function(error) {
+              console.error("Failed to initialize player account for cloud storage:", error);
+            });
+          }
+        }
+
+        if (typeof leaderboardApi !== 'undefined' && !leaderboardApi.isInitialized) {
+          leaderboardApi.sdk = sdk;
+          leaderboardApi.isInitialized = true;
+          leaderboardApi.leaderboard = sdk.leaderboards;
+        }
+
+        yandexGamesPlugin.sendResponse(successCallbackPtr, errorCallbackPtr, { initialized: true, reused: reused }, null);
+      }
+
+      // 1. SDK already initialized externally
+      if (window.ysdk && typeof window.ysdk.environment === 'object') {
+        postInit(window.ysdk, true);
+        return;
+      }
+
+      // 2. SDK script already loaded but not yet initialized
+      if (typeof window.YaGames === 'function') {
+        window.YaGames.init().then(function(sdk) {
+          postInit(sdk, false);
+        }).catch(function(error) {
+          yandexGamesPlugin.sendResponse(successCallbackPtr, errorCallbackPtr, null, error);
+        });
+        return;
+      }
+
+      // 3. Load and initialize SDK
       const sdkScript = document.createElement('script');
-      sdkScript.src = yandexGamesPlugin.isProduction() ? '/sdk.js' : 'https://yandex.ru/games/sdk/v2';
+      sdkScript.src = yandexGamesPlugin.getSdkScriptSrc();
       document.head.appendChild(sdkScript);
 
       sdkScript.onload = function() {
         window.YaGames.init().then(function(sdk) {
-          yandexGamesPlugin.sdk = sdk;
-          yandexGamesPlugin.isInitialized = true;
-          
-          // Initialize other modules if they exist
-          if (typeof advertisementApi !== 'undefined') {
-            advertisementApi.sdk = sdk;
-            advertisementApi.isInitialized = true;
-          }
-        
-          // Initialize purchase API
-          if (typeof purchaseApi !== 'undefined') {
-            purchaseApi.sdk = sdk;
-            purchaseApi.initializePayments().catch(function(error) {
-              console.error("Failed to initialize payments:", error);
-            });
-          }
-          
-          if (typeof authenticationApi !== 'undefined') {
-            authenticationApi.sdk = sdk;
-            authenticationApi.isInitialized = true;
-            
-            // Initialize player account data
-            sdk.getPlayer({ scopes: false }).then(function(player) {
-              authenticationApi.playerAccount = player;
-              if (player.getMode() !== 'lite') {
-                 authenticationApi.isAuthorized = true;
-              }
-            }).catch(function(error) {
-              console.error("Failed to initialize player account:", error);
-            });
-          }
-          
-          if (typeof cloudStorageApi !== 'undefined') {
-            cloudStorageApi.sdk = sdk;
-            cloudStorageApi.isInitialized = true;
-            
-            // Initialize player account if not already done by authentication module
-            if (!cloudStorageApi.playerAccount) {
-              sdk.getPlayer({ scopes: false }).then(function(player) {
-                cloudStorageApi.playerAccount = player;
-              }).catch(function(error) {
-                console.error("Failed to initialize player account for cloud storage:", error);
-              });
-            }
-          }
-          if (typeof leaderboardApi !== 'undefined') {
-            leaderboardApi.sdk = sdk;
-            leaderboardApi.isInitialized = true;
-            
-            // Initialize leaderboard API
-            sdk.getLeaderboards().then(function(leaderboard) {
-              leaderboardApi.leaderboard = leaderboard;
-            }).catch(function(error) {
-              console.error("Failed to initialize leaderboard:", error);
-            });
-          }
-          
-          yandexGamesPlugin.sendResponse(
-            successCallbackPtr,
-            errorCallbackPtr,
-            { initialized: true },
-            null
-          );
-          
+          postInit(sdk, false);
         }).catch(function(error) {
-          yandexGamesPlugin.sendResponse(
-            successCallbackPtr,
-            errorCallbackPtr,
-            null,
-            error
-          );
+          yandexGamesPlugin.sendResponse(successCallbackPtr, errorCallbackPtr, null, error);
         });
       };
-      
+
       sdkScript.onerror = function() {
-        yandexGamesPlugin.sendResponse(
-          successCallbackPtr,
-          errorCallbackPtr,
-          null,
-          "Failed to load Yandex Games SDK script"
+        yandexGamesPlugin.sendResponse(successCallbackPtr, errorCallbackPtr, null,
+            "Failed to load Yandex Games SDK script"
         );
       };
     },
@@ -213,8 +213,9 @@ const yandexGamesPluginLibrary = {
     setGameplayStart: function(successCallbackPtr, errorCallbackPtr) {
       try {
         yandexGamesPlugin.throwIfSdkNotInitialized();
-        // If there's a start method in the future, call it here
-        
+
+        yandexGamesPlugin.sdk.features.GameplayAPI.start();
+
         yandexGamesPlugin.sendResponse(
           successCallbackPtr,
           errorCallbackPtr,
@@ -234,7 +235,7 @@ const yandexGamesPluginLibrary = {
     setGameplayStop: function(successCallbackPtr, errorCallbackPtr) {
       try {
         yandexGamesPlugin.throwIfSdkNotInitialized();
-        // If there's a stop method in the future, call it here
+        yandexGamesPlugin.sdk.features.GameplayAPI.stop();
         
         yandexGamesPlugin.sendResponse(
           successCallbackPtr,
@@ -275,18 +276,60 @@ const yandexGamesPluginLibrary = {
         return 0; // Default to Desktop on error
       }
     },
-    
-    isRunningOnYandex: function() {
-      const hostname = window.location.hostname;
-      return hostname.includes('yandex')
-          || hostname.includes('playhop')
-          || window.document.URL.includes('yandex');
+
+    isRunningOnYandex: function () {
+      try {
+        const hostname = window.location.hostname;
+        const referrer = document.referrer;
+        const userAgent = navigator.userAgent;
+        const hash = window.location.hash;
+
+        const hasYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
+        const hasYandexReferrer = referrer && referrer.includes('yandex');
+        const hasYandexUA = userAgent.includes('YaGames'); // fallback for PWA/WebView
+        const hasYandexHashOrigin = hash && decodeURIComponent(hash).includes('origin=https://yandex.ru');
+
+        const isTopLevel = window.top === window;
+
+        // Return true if:
+        // - running directly on Yandex domain (not iframe)
+        // - referrer is from Yandex (iframe case)
+        // - user agent suggests Yandex container (PWA/WebView)
+        // - Yandex origin passed in hash (e.g. Safari Private mode)
+        return (
+            (isTopLevel && hasYandexHost) ||
+            hasYandexReferrer ||
+            hasYandexUA ||
+            hasYandexHashOrigin
+        );
+      } catch (e) {
+        // Fallback: use referrer or hash
+        const hash = window.location.hash;
+        return (
+            (document.referrer && document.referrer.includes('yandex')) ||
+            (hash && decodeURIComponent(hash).includes('origin=https://yandex.ru'))
+        );
+      }
     },
 
-    isProduction: function() {
-      const hostname = window.location.hostname;
-      return !hostname.includes('localhost')
-          && !hostname.includes('127.0.0.1');
+    getSdkScriptSrc: function() {
+      try {
+        const isTopLevel = window.top === window; // Check if the page is not embedded in an iframe
+        const hostname = window.location.hostname;
+
+        const isYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
+
+        // If running as a top-level page on Yandex-hosted domain, use relative path
+        if (isTopLevel && isYandexHost) {
+          return '/sdk.js';
+        }
+
+        // Otherwise (iframe, external hosting, test environment), use full CDN path
+        return 'https://sdk.games.s3.yandex.net/sdk.js';
+      } catch (e) {
+        // If window.top access is blocked (cross-origin iframe), default to full CDN path
+        return 'https://sdk.games.s3.yandex.net/sdk.js';
+      }
     },
 
     isInitializedGetter: function() {

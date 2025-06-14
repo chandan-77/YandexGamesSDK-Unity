@@ -31,7 +31,7 @@ public class YandexGamesExample : MonoBehaviour
     
     private void AuthenticatePlayer()
     {
-        sdk.Authentication.Authenticate((success, error) =>
+        sdk.Authentication.AuthenticateUser(true, (success, error) =>
         {
             if (success)
             {
@@ -45,13 +45,11 @@ public class YandexGamesExample : MonoBehaviour
     
     private void LoadPlayerData()
     {
-        sdk.Authentication.GetPlayerData((success, data, error) =>
-        {
-            if (success && data != null)
-            {
-                playerNameText.text = $"Welcome, {data.name}!";
-            }
-        });
+        var userData = sdk.Authentication.CurrentUser;
+        if (userData == null)
+            return;
+
+        playerNameText.text = $"Welcome, {userData.name}!";
     }
     
     public void SubmitScore(int score)
@@ -60,8 +58,8 @@ public class YandexGamesExample : MonoBehaviour
             return;
             
         scoreText.text = $"Score: {score}";
-        
-        sdk.Leaderboard.SubmitScore("mainLeaderboard", score, (success, error) =>
+
+        sdk.Leaderboard.SubmitScore("mainLeaderboard", score, null, (success, error) =>
         {
             if (success)
                 Debug.Log("Score submitted successfully!");
