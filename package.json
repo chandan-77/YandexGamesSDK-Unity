@@ -1,6 +1,6 @@
 {
   "name": "com.yandexgames.unity",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "displayName": "Yandex Games",
   "description": "A Unity plugin for YandexGames integration.",
   "unity": "2020.3",
