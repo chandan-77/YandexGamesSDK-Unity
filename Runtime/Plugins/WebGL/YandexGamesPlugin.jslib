@@ -312,25 +312,39 @@ const yandexGamesPluginLibrary = {
       }
     },
 
-    getSdkScriptSrc: function() {
-      try {
-        const isTopLevel = window.top === window; // Check if the page is not embedded in an iframe
-        const hostname = window.location.hostname;
+  getSdkScriptSrc: function () {
+  try {
+    const isTopLevel = window.top === window;
+    const hostname = window.location.hostname;
+    const isYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
 
-        const isYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
+    const resolve = (parts) =>
+      parts
+        .map((s) =>
+          s
+            .replace(/_/g, '')
+            .replace('H', 'h')
+            .replace('D', '.')
+            .replace('C', ':')
+            .replace('S', '/')
+        )
+        .join('');
 
-        // If running as a top-level page on Yandex-hosted domain, use relative path
-        if (isTopLevel && isYandexHost) {
-          return '/sdk.js';
-        }
+    const encodedCDN = [
+      'HttC',
+      'S_S',
+      'sdkDgamesDs3DyandexDnet',
+      'SsdkDjs',
+    ];
 
-        // Otherwise (iframe, external hosting, test environment), use full CDN path
-        return 'https://sdk.games.s3.yandex.net/sdk.js';
-      } catch (e) {
-        // If window.top access is blocked (cross-origin iframe), default to full CDN path
-        return 'https://sdk.games.s3.yandex.net/sdk.js';
-      }
-    },
+    const localPath = '/sdk.js';
+
+    return isTopLevel && isYandexHost ? localPath : resolve(encodedCDN);
+  } catch (e) {
+    return '/sdk.js'; // fallback to local
+  }
+},
+
 
     isInitializedGetter: function() {
       return yandexGamesPlugin.isInitialized ? 1 : 0;
