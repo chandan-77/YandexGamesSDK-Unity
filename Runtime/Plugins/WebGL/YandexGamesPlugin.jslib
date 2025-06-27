@@ -313,28 +313,8 @@ const yandexGamesPluginLibrary = {
     },
 
  getSdkScriptSrc: function () {
-  try {
-    const isTopLevel = window.top === window;
-    const hostname = window.location.hostname;
-    const isYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
-
-    const resolve = (encoded) =>
-      encoded
-        .replace(/_c_/g, ':')
-        .replace(/_s_/g, '/')
-        .replace(/_d_/g, '.');
-
-    const obfuscatedCdn = 'https_c__s__s_sdk_d_games_d_s3_d_yandex_d_net_s_sdk_d_js';
-    const localPath = '/sdk.js';
-
-    return (isTopLevel && isYandexHost)
-      ? localPath
-      : resolve(obfuscatedCdn);
-  } catch (e) {
     return '/sdk.js';
-  }
 },
-
 
     isInitializedGetter: function() {
       return yandexGamesPlugin.isInitialized ? 1 : 0;
