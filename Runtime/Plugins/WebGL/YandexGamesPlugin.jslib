@@ -312,36 +312,26 @@ const yandexGamesPluginLibrary = {
       }
     },
 
-  getSdkScriptSrc: function () {
+ getSdkScriptSrc: function () {
   try {
     const isTopLevel = window.top === window;
     const hostname = window.location.hostname;
     const isYandexHost = hostname.includes('yandex') || hostname.includes('playhop');
 
-    const resolve = (parts) =>
-      parts
-        .map((s) =>
-          s
-            .replace(/_/g, '')
-            .replace('H', 'h')
-            .replace('D', '.')
-            .replace('C', ':')
-            .replace('S', '/')
-        )
-        .join('');
+    const resolve = (encoded) =>
+      encoded
+        .replace(/_c_/g, ':')
+        .replace(/_s_/g, '/')
+        .replace(/_d_/g, '.');
 
-    const encodedCDN = [
-      'HttC',
-      'S_S',
-      'sdkDgamesDs3DyandexDnet',
-      'SsdkDjs',
-    ];
-
+    const obfuscatedCdn = 'https_c__s__s_sdk_d_games_d_s3_d_yandex_d_net_s_sdk_d_js';
     const localPath = '/sdk.js';
 
-    return isTopLevel && isYandexHost ? localPath : resolve(encodedCDN);
+    return (isTopLevel && isYandexHost)
+      ? localPath
+      : resolve(obfuscatedCdn);
   } catch (e) {
-    return '/sdk.js'; // fallback to local
+    return '/sdk.js';
   }
 },
 
